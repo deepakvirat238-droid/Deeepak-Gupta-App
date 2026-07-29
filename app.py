@@ -70,7 +70,7 @@ elif page == "📂 Upload PDF":
 
     if uploaded_pdf:
         st.success(f"Selected: {uploaded_pdf.name}")
-
+        if st.button("Read PDF"):
         with pdfplumber.open(uploaded_pdf) as pdf:
 
     question_text = ""
