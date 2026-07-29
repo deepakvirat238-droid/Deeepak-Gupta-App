@@ -2,10 +2,10 @@ import streamlit as st
 import pdfplumber
 import re
 import time
-import json
-# ===========================
+
+# =====================================
 # PAGE CONFIG
-# ===========================
+# =====================================
 
 st.set_page_config(
     page_title="MockTest Pro",
@@ -13,18 +13,20 @@ st.set_page_config(
     layout="wide"
 )
 
-# ===========================
+# =====================================
 # SESSION STATE
-# ===========================
+# =====================================
 
 defaults = {
     "pdf_loaded": False,
     "questions": [],
-    "answers": [],
-    "current": 0,
-    "mode": None,
+    "answer_key": {},
+    "current_question": 0,
     "user_answers": {},
-    "review": set(),
+    "review_questions": [],
+    "mode": "",
+    "pdf_text": "",
+    "answer_text": "",
     "timer_start": None
 }
 
@@ -32,14 +34,39 @@ for key, value in defaults.items():
     if key not in st.session_state:
         st.session_state[key] = value
 
-# ===========================
+# =====================================
+# CUSTOM CSS
+# =====================================
+
+st.markdown("""
+<style>
+
+.main{
+    padding-top:10px;
+}
+
+.block-container{
+    padding-top:1rem;
+}
+
+.stButton>button{
+    width:100%;
+    border-radius:10px;
+    height:45px;
+    font-weight:bold;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =====================================
 # SIDEBAR
-# ===========================
+# =====================================
 
 st.sidebar.title("📝 MockTest Pro")
 
 menu = st.sidebar.radio(
-    "Menu",
+    "Select",
     [
         "📂 Upload PDF",
         "🎯 Practice Mode",
@@ -50,117 +77,46 @@ menu = st.sidebar.radio(
 
 st.sidebar.divider()
 
-if st.session_state["pdf_loaded"]:
+if st.session_state.pdf_loaded:
     st.sidebar.success("✅ PDF Loaded")
 else:
-    st.sidebar.warning("❌ No PDF")
+    st.sidebar.warning("❌ No PDF Loaded")
 
-# ===========================
-# UPLOAD PAGE
-# ===========================
+# =====================================
+# HOME
+# =====================================
 
 if menu == "📂 Upload PDF":
 
     st.title("📂 Upload MCQ PDF")
 
-    uploaded = st.file_uploader(
+    uploaded_pdf = st.file_uploader(
         "Choose PDF",
         type=["pdf"]
     )
 
-    if uploaded:
-        st.success("PDF uploaded successfully.")
-if st.button("Read PDF"):
+    if uploaded_pdf:
 
-    with pdfplumber.open(uploaded) as pdf:
+        st.success(uploaded_pdf.name)
 
-        all_text = ""
+        if st.button("Read PDF"):
 
-        answer_page = ""
+            st.info("PDF Reader will be added in Part 2.")
 
-        for i, page in enumerate(pdf.pages):
+elif menu == "🎯 Practice Mode":
 
-            text = page.extract_text()
+    st.title("🎯 Practice Mode")
 
-            if not text:
-                continue
+    st.info("Please upload PDF first.")
 
-            if i == len(pdf.pages) - 1:
-                answer_page = text
-            else:
-                all_text += text + "\n"
+elif menu == "📝 Mock Test":
 
-    st.session_state["pdf_text"] = all_text
-    st.session_state["answer_text"] = answer_page
-    st.session_state["pdf_loaded"] = True
-def parse_questions(text):
+    st.title("📝 Mock Test")
 
-    questions = []
+    st.info("Please upload PDF first.")
 
-    pattern = re.compile(
-        r'(Q?\d+\.?.*?)(?=Q?\d+\.|$)',
-        re.DOTALL
-    )
+elif menu == "📊 Result":
 
-    blocks = pattern.findall(text)
+    st.title("📊 Result")
 
-    for block in blocks:
-
-        lines = [
-            x.strip()
-            for x in block.split("\n")
-            if x.strip()
-        ]
-
-        if len(lines) < 5:
-            continue
-
-        q = {
-            "question": lines[0],
-            "A": "",
-            "B": "",
-            "C": "",
-            "D": "",
-            "answer": "",
-            "user": "",
-            "review": False
-        }
-
-        for line in lines[1:]:
-
-            if line.startswith("A"):
-                q["A"] = line
-
-            elif line.startswith("B"):
-                q["B"] = line
-
-            elif line.startswith("C"):
-                q["C"] = line
-
-            elif line.startswith("D"):
-                q["D"] = line
-
-        questions.append(q)
-
-    return questions
-    st.success("✅ PDF Read Successfully")
-parsed = parse_questions(all_text)
-
-st.session_state["questions"] = parsed
-
-st.success(f"{len(parsed)} Questions Parsed")
-    st.write("Questions Pages")
-
-    st.text_area(
-        "",
-        all_text,
-        height=250
-    )
-
-    st.write("Answer Page")
-
-    st.text_area(
-        "",
-        answer_page,
-        height=150
-    )
+    st.info("No Result Available.")
