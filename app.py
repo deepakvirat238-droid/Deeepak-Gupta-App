@@ -3,39 +3,48 @@ import pdfplumber
 import re
 import time
 
-# ----------------------------
-# App Config
-# ----------------------------
+# -----------------------------
+# APP CONFIG
+# -----------------------------
 st.set_page_config(
     page_title="MockTest Pro",
     page_icon="📝",
     layout="wide"
 )
 
-# ----------------------------
-# Session State
-# ----------------------------
-DEFAULTS = {
-    "pdf_loaded": False,
-    "pdf_text": "",
-    "answer_text": "",
-    "questions": [],
-    "answer_key": {},
-    "current": 0,
-    "user_answers": {},
-    "review": [],
-    "mode": "",
-    "score": 0,
-    "start_time": None,
-}
+# -----------------------------
+# SESSION STATE
+# -----------------------------
+if "pdf_loaded" not in st.session_state:
+    st.session_state.pdf_loaded = False
 
-for key, value in DEFAULTS.items():
-    if key not in st.session_state:
-        st.session_state[key] = value
+if "pdf_text" not in st.session_state:
+    st.session_state.pdf_text = ""
 
-# ----------------------------
-# Sidebar
-# ----------------------------
+if "answer_text" not in st.session_state:
+    st.session_state.answer_text = ""
+
+if "questions" not in st.session_state:
+    st.session_state.questions = []
+
+if "answer_key" not in st.session_state:
+    st.session_state.answer_key = {}
+
+if "current" not in st.session_state:
+    st.session_state.current = 0
+
+if "user_answers" not in st.session_state:
+    st.session_state.user_answers = {}
+
+if "review" not in st.session_state:
+    st.session_state.review = []
+
+if "score" not in st.session_state:
+    st.session_state.score = 0
+
+# -----------------------------
+# SIDEBAR
+# -----------------------------
 st.sidebar.title("📝 MockTest Pro")
 
 page = st.sidebar.radio(
@@ -49,16 +58,18 @@ page = st.sidebar.radio(
     ]
 )
 
-# ----------------------------
-# Home
-# ----------------------------
+# -----------------------------
+# HOME
+# -----------------------------
 if page == "🏠 Home":
-    st.title("📝 MockTest Pro")
-    st.write("Convert any MCQ PDF into a Testbook-style mock test.")
 
-# ----------------------------
-# Upload PDF
-# ----------------------------
+    st.title("📝 MockTest Pro")
+
+    st.write("Convert MCQ PDF into Testbook Style Mock Test.")
+
+# -----------------------------
+# UPLOAD PAGE
+# -----------------------------
 elif page == "📂 Upload PDF":
 
     st.title("📂 Upload PDF")
@@ -69,65 +80,37 @@ elif page == "📂 Upload PDF":
     )
 
     if uploaded_pdf:
-        st.success(f"Selected: {uploaded_pdf.name}")
+
+        st.success(uploaded_pdf.name)
+
         if st.button("Read PDF"):
-        with pdfplumber.open(uploaded_pdf) as pdf:
 
-    question_text = ""
-    answer_text = ""
+            st.info("Step 2 will add PDF Reader.")
 
-    total_pages = len(pdf.pages)
-
-    for i, page in enumerate(pdf.pages):
-
-        text = page.extract_text()
-
-        if not text:
-            continue
-
-        if i == total_pages - 1:
-            answer_text = text
-        else:
-            question_text += text + "\n"
-
-st.session_state["pdf_loaded"] = True
-st.session_state["pdf_text"] = question_text
-st.session_state["answer_text"] = answer_text
-
-st.success("✅ PDF Read Successfully")
-
-with st.expander("📄 Question Pages"):
-    st.text_area(
-        "Questions",
-        question_text,
-        height=250
-    )
-
-with st.expander("🔑 Last Page (Answer Key)"):
-    st.text_area(
-        "Answer Key",
-        answer_text,
-        height=180
-    )
-
-# ----------------------------
-# Practice Mode
-# ----------------------------
+# -----------------------------
+# PRACTICE
+# -----------------------------
 elif page == "🎯 Practice Mode":
+
     st.title("🎯 Practice Mode")
-    st.info("Please upload a PDF first.")
 
-# ----------------------------
-# Mock Test
-# ----------------------------
+    st.warning("Upload PDF First")
+
+# -----------------------------
+# MOCK TEST
+# -----------------------------
 elif page == "📝 Mock Test":
-    st.title("📝 Mock Test")
-    st.info("Please upload a PDF first.")
 
-# ----------------------------
-# Result
-# ----------------------------
+    st.title("📝 Mock Test")
+
+    st.warning("Upload PDF First")
+
+# -----------------------------
+# RESULT
+# -----------------------------
 elif page == "📊 Result":
+
     st.title("📊 Result")
-    st.info("No result available.")
+
+    st.info("No Result Yet")
     
