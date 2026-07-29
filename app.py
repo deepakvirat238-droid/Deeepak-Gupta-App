@@ -1,98 +1,83 @@
 import streamlit as st
-import pandas as pd
 import pdfplumber
 import re
-import io
-import json
-import time
-from datetime import datetime
+import pandas as pd
 from fpdf import FPDF
+
+# ------------------------
+# Page Config
+# ------------------------
 
 st.set_page_config(
     page_title="MockTest Pro v2",
     page_icon="📘",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
+
+# ------------------------
+# CSS
+# ------------------------
+
 st.markdown("""
 <style>
 
 .main{
-    padding:15px;
+    padding:20px;
 }
 
 .stButton>button{
     width:100%;
-    border-radius:10px;
     height:45px;
+    border-radius:10px;
     font-weight:bold;
 }
 
 .question-box{
-    padding:15px;
-    border-radius:12px;
     border:1px solid #ddd;
+    border-radius:10px;
+    padding:15px;
     margin-bottom:15px;
-}
-
-.palette-btn{
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    margin:2px;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
+# ------------------------
+# Session State
+# ------------------------
+
 if "questions" not in st.session_state:
     st.session_state.questions=[]
-
-if "current_question" not in st.session_state:
-    st.session_state.current_question=0
 
 if "answers" not in st.session_state:
     st.session_state.answers={}
 
-if "review" not in st.session_state:
-    st.session_state.review=[]
+if "current_question" not in st.session_state:
+    st.session_state.current_question=0
 
-if "visited" not in st.session_state:
-    st.session_state.visited=[]
+# ------------------------
+# PDF Text Extractor
+# ------------------------
 
-if "timer" not in st.session_state:
-    st.session_state.timer=0
-    st.title("📘 MockTest Pro v2")
+def extract_text_from_pdf(pdf):
 
-st.subheader("PDF to Quiz Converter")
+    full_text=""
 
-uploaded_pdf = st.file_uploader(
-    "Upload PDF",
-    type=["pdf"]
-    
-)text = extract_text_from_pdf(uploaded_pdf)
+    with pdfplumber.open(pdf) as pdf_file:
 
-st.subheader("Extracted Text")
+        for page in pdf_file.pages:
 
-st.text_area(
-    "PDF Content",
-    text,
-    height=400
-)
+            txt=page.extract_text()
 
-if uploaded_pdf is not None:
-    st.success(f"PDF Uploaded Successfully: {uploaded_pdf.name}")
+            if txt:
+                full_text+=txt+"\n"
 
-    
-        def extract_text_from_pdf(pdf_file):
-    text = ""
+    return full_text
 
-    with pdfplumber.open(pdf_file) as pdf:
+# ------------------------
+# Title
+# ------------------------
 
-        for page in pdf.pages:
+st.title("📘 MockTest Pro v2")
 
-            page_text = page.extract_text()
-
-            if page_text:
-                text += page_text + "\n"
-
-    return text
+st.write("Professional PDF to Quiz Converter")
