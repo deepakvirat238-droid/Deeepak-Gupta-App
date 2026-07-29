@@ -61,3 +61,17 @@ if "visited" not in st.session_state:
 
 if "timer" not in st.session_state:
     st.session_state.timer=0
+    st.title("📘 MockTest Pro v2")
+
+st.subheader("PDF to Quiz Converter")
+
+uploaded_pdf = st.file_uploader(
+    "Upload PDF",
+    type=["pdf"]
+)
+
+if uploaded_pdf is not None:
+    st.success(f"PDF Uploaded Successfully: {uploaded_pdf.name}")
+
+    if st.button("Extract Questions"):
+        st.info("Professional PDF Parser is coming in the next update...")
