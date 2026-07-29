@@ -105,7 +105,15 @@ page = st.sidebar.radio(
         "⚙️ Settings"
     ]
     )
-st.title("📘 MockTest Pro v2")
+if page == "🏠 Home":
+
+    st.title("📘 MockTest Pro v2")
+
+    st.write("Professional PDF to Quiz Converter")
+
+    st.info(
+        "Select an option from the left sidebar."
+    )
 
 st.write("Professional PDF to Quiz Converter")
 
