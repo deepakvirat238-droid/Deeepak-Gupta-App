@@ -1,12 +1,10 @@
 import streamlit as st
 import pdfplumber
 import re
-import pandas as pd
-from fpdf import FPDF
 
-# ------------------------
-# Page Config
-# ------------------------
+# --------------------------
+# PAGE CONFIG
+# --------------------------
 
 st.set_page_config(
     page_title="MockTest Pro v2",
@@ -14,9 +12,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# ------------------------
+# --------------------------
 # CSS
-# ------------------------
+# --------------------------
 
 st.markdown("""
 <style>
@@ -32,66 +30,63 @@ st.markdown("""
     font-weight:bold;
 }
 
-.question-box{
-    border:1px solid #ddd;
-    border-radius:10px;
-    padding:15px;
-    margin-bottom:15px;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------------
-# Session State
-# ------------------------
+# --------------------------
+# SESSION
+# --------------------------
 
 if "questions" not in st.session_state:
     st.session_state.questions=[]
 
-if "answers" not in st.session_state:
-    st.session_state.answers={}
-
-if "current_question" not in st.session_state:
-    st.session_state.current_question=0
-
-# ------------------------
-# PDF Text Extractor
-# ------------------------
+# --------------------------
+# PDF TEXT
+# --------------------------
 
 def extract_text_from_pdf(pdf):
 
-    full_text=""
+    text=""
 
     with pdfplumber.open(pdf) as pdf_file:
 
         for page in pdf_file.pages:
 
-            txt=page.extract_text()
+            page_text=page.extract_text()
 
-            if txt:
-                full_text+=txt+"\n"
+            if page_text:
 
-    return full_text
+                text+=page_text+"\n"
+
+    return text
+
+# --------------------------
+# QUESTION DETECTOR
+# --------------------------
+
 def detect_questions(text):
 
-    pattern = r'(Q\.?\d+.*?)(?=Q\.?\d+|$)'
+    pattern=r'(Q\.?\d+.*?)(?=Q\.?\d+|$)'
 
-    return re.findall(
+    questions=re.findall(
         pattern,
         text,
-        flags=re.DOTALL | re.IGNORECASE
+        flags=re.DOTALL|re.IGNORECASE
     )
-# ------------------------
-# Title
-# ------------------------
+
+    return questions
+
+# --------------------------
+# TITLE
+# --------------------------
 
 st.title("📘 MockTest Pro v2")
 
 st.write("Professional PDF to Quiz Converter")
+
 st.divider()
 
-uploaded_pdf = st.file_uploader(
+uploaded_pdf=st.file_uploader(
     "📄 Upload PDF",
     type=["pdf"]
 )
@@ -104,7 +99,7 @@ if uploaded_pdf:
 
         with st.spinner("Reading PDF..."):
 
-            text = extract_text_from_pdf(uploaded_pdf)
+            text=extract_text_from_pdf(uploaded_pdf)
 
         st.success("PDF Read Successfully")
 
@@ -112,11 +107,27 @@ if uploaded_pdf:
             "Extracted Text",
             text,
             height=400
-        )
-questions = detect_questions(text)
+                    questions = detect_questions(text)
 
-st.success(f"Questions Found: {len(questions)}")
+        st.success(f"Questions Found: {len(questions)}")
 
-for i, q in enumerate(questions[:10], start=1):
-    with st.expander(f"Question {i}"):
-        st.write(q)
+        st.divider()
+
+        for i, q in enumerate(questions[:10], start=1):
+
+            with st.expander(f"Question {i}"):
+
+                st.write(q)
+
+        st.session_state.questions = questions
+
+if st.session_state.questions:
+
+    st.divider()
+
+    st.subheader("📋 Extracted Question List")
+
+    for i, q in enumerate(st.session_state.questions, start=1):
+
+        st.write(f"**Q{i}.** {q[:120]}...")
+    )
