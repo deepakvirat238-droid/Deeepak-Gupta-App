@@ -68,10 +68,31 @@ st.subheader("PDF to Quiz Converter")
 uploaded_pdf = st.file_uploader(
     "Upload PDF",
     type=["pdf"]
+    
+)text = extract_text_from_pdf(uploaded_pdf)
+
+st.subheader("Extracted Text")
+
+st.text_area(
+    "PDF Content",
+    text,
+    height=400
 )
 
 if uploaded_pdf is not None:
     st.success(f"PDF Uploaded Successfully: {uploaded_pdf.name}")
 
-    if st.button("Extract Questions"):
-        st.info("Professional PDF Parser is coming in the next update...")
+    
+        def extract_text_from_pdf(pdf_file):
+    text = ""
+
+    with pdfplumber.open(pdf_file) as pdf:
+
+        for page in pdf.pages:
+
+            page_text = page.extract_text()
+
+            if page_text:
+                text += page_text + "\n"
+
+    return text
