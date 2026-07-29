@@ -71,8 +71,44 @@ elif page == "📂 Upload PDF":
     if uploaded_pdf:
         st.success(f"Selected: {uploaded_pdf.name}")
 
-        if st.button("Read PDF"):
-            st.info("PDF Reader will be added in Step 2.")
+        with pdfplumber.open(uploaded_pdf) as pdf:
+
+    question_text = ""
+    answer_text = ""
+
+    total_pages = len(pdf.pages)
+
+    for i, page in enumerate(pdf.pages):
+
+        text = page.extract_text()
+
+        if not text:
+            continue
+
+        if i == total_pages - 1:
+            answer_text = text
+        else:
+            question_text += text + "\n"
+
+st.session_state["pdf_loaded"] = True
+st.session_state["pdf_text"] = question_text
+st.session_state["answer_text"] = answer_text
+
+st.success("✅ PDF Read Successfully")
+
+with st.expander("📄 Question Pages"):
+    st.text_area(
+        "Questions",
+        question_text,
+        height=250
+    )
+
+with st.expander("🔑 Last Page (Answer Key)"):
+    st.text_area(
+        "Answer Key",
+        answer_text,
+        height=180
+    )
 
 # ----------------------------
 # Practice Mode
