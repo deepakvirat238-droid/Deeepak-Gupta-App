@@ -105,3 +105,10 @@ if uploaded_pdf:
             text,
             height=400
         )
+questions = detect_questions(text)
+
+st.success(f"Questions Found: {len(questions)}")
+
+for i, q in enumerate(questions[:10], start=1):
+    with st.expander(f"Question {i}"):
+        st.write(q)
