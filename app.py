@@ -73,7 +73,15 @@ def extract_text_from_pdf(pdf):
                 full_text+=txt+"\n"
 
     return full_text
+def detect_questions(text):
 
+    pattern = r'(Q\.?\d+.*?)(?=Q\.?\d+|$)'
+
+    return re.findall(
+        pattern,
+        text,
+        flags=re.DOTALL | re.IGNORECASE
+    )
 # ------------------------
 # Title
 # ------------------------
