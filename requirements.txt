@@ -1,6 +1,2 @@
 streamlit
-pandas
-plotly
-fpdf2
 pdfplumber
-PyPDF2
