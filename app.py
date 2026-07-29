@@ -106,8 +106,8 @@ if uploaded_pdf:
         st.text_area(
             "Extracted Text",
             text,
-            height=400
-        )
+            height=400 
+)
                     questions = detect_questions(text)
 
         st.success(f"Questions Found: {len(questions)}")
