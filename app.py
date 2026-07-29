@@ -81,3 +81,27 @@ def extract_text_from_pdf(pdf):
 st.title("📘 MockTest Pro v2")
 
 st.write("Professional PDF to Quiz Converter")
+st.divider()
+
+uploaded_pdf = st.file_uploader(
+    "📄 Upload PDF",
+    type=["pdf"]
+)
+
+if uploaded_pdf:
+
+    st.success(f"✅ {uploaded_pdf.name} uploaded successfully")
+
+    if st.button("📥 Extract Text"):
+
+        with st.spinner("Reading PDF..."):
+
+            text = extract_text_from_pdf(uploaded_pdf)
+
+        st.success("PDF Read Successfully")
+
+        st.text_area(
+            "Extracted Text",
+            text,
+            height=400
+        )
