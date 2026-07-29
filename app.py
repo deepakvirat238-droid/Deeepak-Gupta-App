@@ -92,3 +92,29 @@ class PDFQuizConverter:
             "explanation":""
 
         }
+            def smart_question_parser(self, text):
+
+        question_blocks = self.split_into_questions(text)
+
+        parsed_questions = []
+
+        for block in question_blocks:
+
+            q = self.parse_single_question(block)
+
+            if q:
+
+                if len(q["options"]) >= 4:
+
+                    parsed_questions.append(q)
+
+        return parsed_questions
+
+
+    def convert_pdf_to_quiz(self, pdf_file):
+
+        text = self.extract_text_from_pdf(pdf_file)
+
+        questions = self.smart_question_parser(text)
+
+        return questions
