@@ -1,13 +1,3 @@
-Here is the completely rewritten, production-grade **MockTest Pro** application.
-It upgrades the UI to closely replicate the actual desktop and mobile grid environment of **Testbook** / **TCS iON** exam portals—complete with a dual-pane responsive layout, sticky timer banners, a split-screen layout for text viewports, correct structural tag styling for the question palette grid, comprehensive handling for option lines without explicit periods (e.g., A Mars), and clean data sync using Streamlit session state architecture.
-### requirements.txt
-```text
-streamlit>=1.35.0
-pdfplumber>=0.11.0
-
-```
-### app.py
-```python
 import streamlit as st
 import pdfplumber
 import re
@@ -61,20 +51,6 @@ def apply_premium_css():
             border-bottom: 1px dashed #e0e0e0;
             padding-bottom: 12px;
             margin-bottom: 16px;
-        }
-        
-        /* TCS iON Standard Color Palette Palette Engine */
-        .palette-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
-            gap: 8px;
-            padding: 10px 0;
-        }
-        
-        /* Native Button Injections via Streamlit workaround using container layout tags */
-        div.stButton > button {
-            border-radius: 4px !important;
-            transition: all 0.2s ease-in-out;
         }
         
         /* Interactive Box Styles */
@@ -145,7 +121,7 @@ def extract_pdf_data(uploaded_file):
                 if text:
                     question_text += text + "\n"
             
-            # Extract pure context from final index sheet position
+            # Extract pure context from final sheet position
             last_page_text = pdf.pages[-1].extract_text()
             if not last_page_text:
                 return None, None, "Unable to pull structural string characters from final key sheet position."
@@ -160,7 +136,6 @@ def parse_answer_key(text):
     Supports: '1.B', '1-B', '1:B', '1) B', 'Q1 B', '24. C'
     """
     answers = {}
-    # Eliminate noisy text strings like "ANSWER KEY" or "Ans" to leave clean text lines
     clean_text = re.sub(r'(ANSWER\s*KEY|Ans[:\s]*)', '', text, flags=re.IGNORECASE)
     
     # Catch question index number and primary single character selection option
@@ -226,7 +201,7 @@ def parse_questions(text, answer_key):
 # 4. TESTBOOK COMPACT PALETTE GRID
 # ==========================================
 def render_testbook_palette():
-    """Renders a fully responsive palette grid utilizing standard Streamlit column blocks."""
+    """Renders a responsive palette grid utilizing standard Streamlit column blocks."""
     st.markdown("### 🗂️ Question Navigation Grid")
     
     total_qs = len(st.session_state.questions)
@@ -240,7 +215,6 @@ def render_testbook_palette():
                 q = st.session_state.questions[idx]
                 q_num = q["question_number"]
                 
-                # Assign precise dynamic labeling for clear states
                 label = f"{q_num}"
                 if idx == st.session_state.current_question_index:
                     label = f"🔵 {q_num}"
@@ -274,7 +248,7 @@ def render_home_page():
     st.markdown("""
     <div class="exam-header">
         <h2 style='margin:0; color:white;'>🚀 MockTest Pro Core Dashboard</h2>
-        <span style='font-weight:bold; background:rgba(255,255,255,0.2); padding:6px 12px; border-radius:4px;'>v2.5 Production Ready</span>
+        <span style='font-weight:bold; background:rgba(255,255,255,0.2); padding:6px 12px; border-radius:4px;'>v2.6 Live</span>
     </div>
     """, unsafe_allow_html=True)
     
@@ -334,7 +308,7 @@ def render_practice_page():
         if q["user_answer"]:
             curr_selection = ["A", "B", "C", "D"].index(q["user_answer"])
             
-        selected_option = st.radio("Choose your answer choice:", opts, index=curr_selection, key=f"prac_radio_{q_idx}")
+        selected_option = st.radio("Select your verified choice for this question:", opts, index=curr_selection, key=f"prac_radio_{q_idx}")
         
         if selected_option:
             user_ans = selected_option[0]
@@ -348,15 +322,15 @@ def render_practice_page():
         st.write("---")
         b1, b2, b3 = st.columns(3)
         with b1:
-            if st.button("⬅ Previous", disabled=(q_idx == 0), use_container_width=True):
+            if st.button("⬅ Previous", disabled=(q_idx == 0), use_container_width=True, key="prac_prev_btn"):
                 st.session_state.current_question_index -= 1
                 st.rerun()
         with b2:
-            if st.button("🧹 Clear Choice", use_container_width=True):
+            if st.button("🧹 Clear Choice", use_container_width=True, key="prac_clear_btn"):
                 st.session_state.questions[q_idx]["user_answer"] = None
                 st.rerun()
         with b3:
-            if st.button("Next ➡", disabled=(q_idx == len(st.session_state.questions) - 1), use_container_width=True):
+            if st.button("Next ➡", disabled=(q_idx == len(st.session_state.questions) - 1), use_container_width=True, key="prac_next_btn"):
                 st.session_state.current_question_index += 1
                 st.session_state.visited_questions.add(st.session_state.current_question_index)
                 st.rerun()
@@ -372,7 +346,6 @@ def render_mock_page():
         st.warning("No active evaluation schema discovered. Ingest data via the **Upload PDF** framework tab first.")
         return
         
-    # Start the exam timer once the page is opened
     if st.session_state.test_start_time is None:
         st.session_state.test_start_time = time.time()
         
@@ -409,21 +382,21 @@ def render_mock_page():
         if q["user_answer"]:
             curr_selection = ["A", "B", "C", "D"].index(q["user_answer"])
             
-        selected_option = st.radio("Choose matching option parameter:", opts, index=curr_selection, key=f"mock_radio_{q_idx}")
+        selected_option = st.radio("Select matching option parameter for submission:", opts, index=curr_selection, key=f"mock_radio_{q_idx}")
         
         st.write("---")
         nav_1, nav_2, nav_3, nav_4 = st.columns(4)
         
         with nav_1:
-            if st.button("⬅ Previous", disabled=(q_idx == 0), use_container_width=True):
+            if st.button("⬅ Previous", disabled=(q_idx == 0), use_container_width=True, key="mock_prev_btn"):
                 st.session_state.current_question_index -= 1
                 st.rerun()
         with nav_2:
-            if st.button("🧹 Clear", use_container_width=True):
+            if st.button("🧹 Clear", use_container_width=True, key="mock_clear_btn"):
                 st.session_state.questions[q_idx]["user_answer"] = None
                 st.rerun()
         with nav_3:
-            if st.button("🟣 Mark for Review", use_container_width=True):
+            if st.button("🟣 Mark for Review", use_container_width=True, key="mock_review_btn"):
                 st.session_state.questions[q_idx]["review"] = True
                 if selected_option:
                     st.session_state.questions[q_idx]["user_answer"] = selected_option[0]
@@ -432,7 +405,7 @@ def render_mock_page():
                     st.session_state.visited_questions.add(st.session_state.current_question_index)
                 st.rerun()
         with nav_4:
-            if st.button("💾 Save & Next ➡", type="primary", use_container_width=True):
+            if st.button("💾 Save & Next ➡", type="primary", use_container_width=True, key="mock_save_btn"):
                 if selected_option:
                     st.session_state.questions[q_idx]["user_answer"] = selected_option[0]
                 st.session_state.questions[q_idx]["review"] = False
@@ -442,7 +415,7 @@ def render_mock_page():
                 st.rerun()
                 
         st.write("---")
-        if st.button("🛑 Finish Test & Submit Profile Pack", use_container_width=True):
+        if st.button("🛑 Finish Test & Submit Profile Pack", use_container_width=True, key="mock_submit_btn"):
             st.session_state.test_submitted = True
             st.session_state.time_taken_seconds = elapsed
             st.session_state.current_page = "Result"
@@ -473,7 +446,6 @@ def render_result_page():
     accuracy = (correct / (correct + wrong) * 100) if (correct + wrong) > 0 else 0
     final_percentage = (correct / total_q) * 100
     
-    # Analytics Metrics Row
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("Total Evaluation Items", total_q)
     m2.metric("Correct Matrix Hits", correct)
@@ -543,4 +515,3 @@ def main():
 if __name__ == "__main__":
     main()
 
-```
