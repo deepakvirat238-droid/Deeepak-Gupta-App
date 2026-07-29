@@ -206,3 +206,99 @@ if st.session_state.questions:
                 st.write(option)
 
             st.divider()
+# =====================================
+# QUIZ MODE
+# =====================================
+
+if st.session_state.questions:
+
+    st.divider()
+    st.header("📝 Quiz Mode")
+
+    score = 0
+
+    for i, raw_question in enumerate(st.session_state.questions):
+
+        mcq = parse_mcq(raw_question)
+
+        if not mcq:
+            continue
+
+        st.markdown(f"### Q{i+1}")
+
+        st.write(mcq["question"])
+
+        if len(mcq["options"]) >= 2:
+
+            st.radio(
+                "Choose your answer",
+                mcq["options"],
+                key=f"quiz_{i}"
+            )
+
+    st.button("Submit Quiz")
+    # =====================================
+# ANSWER KEY
+# =====================================
+
+if "answers" not in st.session_state:
+    st.session_state.answers = {}
+
+st.divider()
+st.header("📋 Answer Key")
+
+st.info(
+    "Enter the correct option for each question "
+    "(A/B/C/D)."
+)
+
+for i, raw_question in enumerate(st.session_state.questions):
+
+    st.session_state.answers[i] = st.selectbox(
+        f"Correct Answer - Q{i+1}",
+        ["A", "B", "C", "D"],
+        key=f"answer_{i}"
+    )
+
+# =====================================
+# RESULT
+# =====================================
+
+if st.button("✅ Calculate Score"):
+
+    total = len(st.session_state.questions)
+    score = 0
+
+    for i in range(total):
+
+        user = st.session_state.get(f"quiz_{i}")
+
+        correct = st.session_state.answers[i]
+
+        if user:
+
+            if user.upper().startswith(correct):
+                score += 1
+
+    st.divider()
+
+    st.success(f"Score : {score}/{total}")
+
+    if total > 0:
+
+        percentage = score * 100 / total
+
+        st.write(f"Percentage : {percentage:.2f}%")
+
+        if percentage >= 90:
+            st.balloons()
+            st.success("Excellent!")
+
+        elif percentage >= 75:
+            st.success("Very Good!")
+
+        elif percentage >= 50:
+            st.warning("Good, keep practicing.")
+
+        else:
+            st.error("Needs Improvement.")
