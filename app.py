@@ -302,3 +302,62 @@ if st.button("✅ Calculate Score"):
 
         else:
             st.error("Needs Improvement.")
+# =====================================
+# AUTO ANSWER KEY DETECTION
+# =====================================
+
+def detect_answer_key(text):
+
+    answers = {}
+
+    patterns = [
+
+        r'(\d+)\s*[-:]\s*([ABCD])',
+
+        r'(\d+)\.\s*([ABCD])',
+
+        r'Q\.?\s*(\d+)\s*[-:]\s*([ABCD])'
+
+    ]
+
+    for pattern in patterns:
+
+        matches = re.findall(
+            pattern,
+            text,
+            flags=re.IGNORECASE
+        )
+
+        if matches:
+
+            for qno, ans in matches:
+
+                answers[int(qno)] = ans.upper()
+
+            break
+
+    return answers
+
+# =====================================
+# SHOW DETECTED ANSWERS
+# =====================================
+
+if st.session_state.text:
+
+    auto_answers = detect_answer_key(
+        st.session_state.text
+    )
+
+    if auto_answers:
+
+        st.divider()
+
+        st.header("✅ Auto Detected Answer Key")
+
+        st.write(auto_answers)
+
+    else:
+
+        st.info(
+            "No Answer Key detected in PDF."
+    )
