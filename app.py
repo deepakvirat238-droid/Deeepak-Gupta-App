@@ -88,7 +88,23 @@ def detect_questions(text):
 # =====================================
 # TITLE
 # =====================================
+# =====================================
+# SIDEBAR MENU
+# =====================================
 
+page = st.sidebar.radio(
+    "📋 Navigation",
+    [
+        "🏠 Home",
+        "📂 Upload PDF",
+        "📄 Extracted Text",
+        "❓ Questions",
+        "📝 Quiz",
+        "🔑 Answer Key",
+        "📊 Result",
+        "⚙️ Settings"
+    ]
+    )
 st.title("📘 MockTest Pro v2")
 
 st.write("Professional PDF to Quiz Converter")
