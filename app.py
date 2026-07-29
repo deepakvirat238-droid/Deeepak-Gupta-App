@@ -93,9 +93,62 @@ if st.button("Read PDF"):
     st.session_state["pdf_text"] = all_text
     st.session_state["answer_text"] = answer_page
     st.session_state["pdf_loaded"] = True
+def parse_questions(text):
 
+    questions = []
+
+    pattern = re.compile(
+        r'(Q?\d+\.?.*?)(?=Q?\d+\.|$)',
+        re.DOTALL
+    )
+
+    blocks = pattern.findall(text)
+
+    for block in blocks:
+
+        lines = [
+            x.strip()
+            for x in block.split("\n")
+            if x.strip()
+        ]
+
+        if len(lines) < 5:
+            continue
+
+        q = {
+            "question": lines[0],
+            "A": "",
+            "B": "",
+            "C": "",
+            "D": "",
+            "answer": "",
+            "user": "",
+            "review": False
+        }
+
+        for line in lines[1:]:
+
+            if line.startswith("A"):
+                q["A"] = line
+
+            elif line.startswith("B"):
+                q["B"] = line
+
+            elif line.startswith("C"):
+                q["C"] = line
+
+            elif line.startswith("D"):
+                q["D"] = line
+
+        questions.append(q)
+
+    return questions
     st.success("✅ PDF Read Successfully")
+parsed = parse_questions(all_text)
 
+st.session_state["questions"] = parsed
+
+st.success(f"{len(parsed)} Questions Parsed")
     st.write("Questions Pages")
 
     st.text_area(
