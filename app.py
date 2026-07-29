@@ -2,9 +2,9 @@ import streamlit as st
 import pdfplumber
 import re
 
-# --------------------------
+# =====================================
 # PAGE CONFIG
-# --------------------------
+# =====================================
 
 st.set_page_config(
     page_title="MockTest Pro v2",
@@ -12,9 +12,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# --------------------------
+# =====================================
 # CSS
-# --------------------------
+# =====================================
 
 st.markdown("""
 <style>
@@ -30,55 +30,64 @@ st.markdown("""
     font-weight:bold;
 }
 
+.question-box{
+    border:1px solid #dddddd;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:10px;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
-# --------------------------
-# SESSION
-# --------------------------
+# =====================================
+# SESSION STATE
+# =====================================
 
 if "questions" not in st.session_state:
-    st.session_state.questions=[]
+    st.session_state.questions = []
 
-# --------------------------
-# PDF TEXT
-# --------------------------
+if "text" not in st.session_state:
+    st.session_state.text = ""
 
-def extract_text_from_pdf(pdf):
+# =====================================
+# PDF TEXT EXTRACTOR
+# =====================================
 
-    text=""
+def extract_text_from_pdf(pdf_file):
 
-    with pdfplumber.open(pdf) as pdf_file:
+    full_text = ""
 
-        for page in pdf_file.pages:
+    with pdfplumber.open(pdf_file) as pdf:
 
-            page_text=page.extract_text()
+        for page in pdf.pages:
+
+            page_text = page.extract_text()
 
             if page_text:
+                full_text += page_text + "\n"
 
-                text+=page_text+"\n"
+    return full_text
 
-    return text
-
-# --------------------------
+# =====================================
 # QUESTION DETECTOR
-# --------------------------
+# =====================================
 
 def detect_questions(text):
 
-    pattern=r'(Q\.?\d+.*?)(?=Q\.?\d+|$)'
+    pattern = r"(Q\.?\s*\d+.*?)(?=Q\.?\s*\d+|$)"
 
-    questions=re.findall(
+    questions = re.findall(
         pattern,
         text,
-        flags=re.DOTALL|re.IGNORECASE
+        flags=re.DOTALL | re.IGNORECASE
     )
 
     return questions
 
-# --------------------------
+# =====================================
 # TITLE
-# --------------------------
+# =====================================
 
 st.title("📘 MockTest Pro v2")
 
@@ -86,10 +95,13 @@ st.write("Professional PDF to Quiz Converter")
 
 st.divider()
 
-uploaded_pdf=st.file_uploader(
+uploaded_pdf = st.file_uploader(
     "📄 Upload PDF",
     type=["pdf"]
-)
+            )
+# =====================================
+# PDF READER
+# =====================================
 
 if uploaded_pdf:
 
@@ -99,36 +111,98 @@ if uploaded_pdf:
 
         with st.spinner("Reading PDF..."):
 
-            text=extract_text_from_pdf(uploaded_pdf)
+            text = extract_text_from_pdf(uploaded_pdf)
 
-        st.success("PDF Read Successfully")
+            st.session_state.text = text
 
-        st.text_area(
-            "Extracted Text",
-            text,
-            height=400 
-)
-                    questions = detect_questions(text)
+            st.session_state.questions = detect_questions(text)
 
-        st.success(f"Questions Found: {len(questions)}")
+# =====================================
+# SHOW TEXT
+# =====================================
 
-        st.divider()
+if st.session_state.text:
 
-        for i, q in enumerate(questions[:10], start=1):
+    st.success("PDF Read Successfully")
 
-            with st.expander(f"Question {i}"):
+    st.text_area(
+        "Extracted Text",
+        st.session_state.text,
+        height=400
+    )
 
-                st.write(q)
+# =====================================
+# SHOW QUESTIONS
+# =====================================
 
-        st.session_state.questions = questions
+if st.session_state.questions:
+
+    st.success(
+        f"Questions Found : {len(st.session_state.questions)}"
+    )
+
+    st.divider()
+
+    st.subheader("Detected Questions")
+
+    for i, q in enumerate(
+        st.session_state.questions,
+        start=1
+    ):
+
+        with st.expander(f"Question {i}"):
+
+            st.write(q)
+    # =====================================
+# PARSE QUESTION + OPTIONS
+# =====================================
+
+def parse_mcq(question_text):
+
+    lines = [line.strip() for line in question_text.split("\n") if line.strip()]
+
+    if not lines:
+        return None
+
+    question = ""
+    options = []
+
+    for line in lines:
+
+        if re.match(r'^\(?[A-Da-d]\)|^[A-Da-d][\.\)]', line):
+            options.append(line)
+        else:
+            if len(options) == 0:
+                question += line + " "
+            else:
+                options[-1] += " " + line
+
+    return {
+        "question": question.strip(),
+        "options": options
+    }
+
+# =====================================
+# SHOW PARSED QUESTIONS
+# =====================================
 
 if st.session_state.questions:
 
     st.divider()
 
-    st.subheader("📋 Extracted Question List")
+    st.subheader("Parsed MCQs")
 
-    for i, q in enumerate(st.session_state.questions, start=1):
+    for i, raw_question in enumerate(st.session_state.questions[:20], start=1):
 
-        st.write(f"**Q{i}.** {q[:120]}...")
-    )
+        mcq = parse_mcq(raw_question)
+
+        if mcq:
+
+            st.markdown(f"### Question {i}")
+
+            st.write(mcq["question"])
+
+            for option in mcq["options"]:
+                st.write(option)
+
+            st.divider()
