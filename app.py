@@ -70,6 +70,44 @@ if menu == "📂 Upload PDF":
 
     if uploaded:
         st.success("PDF uploaded successfully.")
+if st.button("Read PDF"):
 
-        if st.button("Read PDF"):
-            st.info("PDF reading will be added in Part 2.")
+    with pdfplumber.open(uploaded) as pdf:
+
+        all_text = ""
+
+        answer_page = ""
+
+        for i, page in enumerate(pdf.pages):
+
+            text = page.extract_text()
+
+            if not text:
+                continue
+
+            if i == len(pdf.pages) - 1:
+                answer_page = text
+            else:
+                all_text += text + "\n"
+
+    st.session_state["pdf_text"] = all_text
+    st.session_state["answer_text"] = answer_page
+    st.session_state["pdf_loaded"] = True
+
+    st.success("✅ PDF Read Successfully")
+
+    st.write("Questions Pages")
+
+    st.text_area(
+        "",
+        all_text,
+        height=250
+    )
+
+    st.write("Answer Page")
+
+    st.text_area(
+        "",
+        answer_page,
+        height=150
+    )
