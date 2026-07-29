@@ -1,120 +1,63 @@
-import re
+import streamlit as st
+import pandas as pd
 import pdfplumber
+import re
+import io
+import json
+import time
+from datetime import datetime
+from fpdf import FPDF
 
-class PDFQuizConverter:
+st.set_page_config(
+    page_title="MockTest Pro v2",
+    page_icon="📘",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+st.markdown("""
+<style>
 
-    def extract_text_from_pdf(self, pdf_file):
+.main{
+    padding:15px;
+}
 
-        text = ""
+.stButton>button{
+    width:100%;
+    border-radius:10px;
+    height:45px;
+    font-weight:bold;
+}
 
-        with pdfplumber.open(pdf_file) as pdf:
+.question-box{
+    padding:15px;
+    border-radius:12px;
+    border:1px solid #ddd;
+    margin-bottom:15px;
+}
 
-            for page in pdf.pages:
+.palette-btn{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    margin:2px;
+}
 
-                page_text = page.extract_text()
+</style>
+""", unsafe_allow_html=True)
+if "questions" not in st.session_state:
+    st.session_state.questions=[]
 
-                if page_text:
-                    text += page_text + "\n"
+if "current_question" not in st.session_state:
+    st.session_state.current_question=0
 
-        return text
+if "answers" not in st.session_state:
+    st.session_state.answers={}
 
+if "review" not in st.session_state:
+    st.session_state.review=[]
 
-    def split_into_questions(self, text):
+if "visited" not in st.session_state:
+    st.session_state.visited=[]
 
-        pattern = r'(?=Q\.?\s*\d+\)|Q\.?\s*\d+\.|Q\s*\d+|Question\s*\d+|\n\d+\.)'
-
-        parts = re.split(pattern, text)
-
-        questions = []
-
-        for p in parts:
-
-            p = p.strip()
-
-            if len(p) > 20:
-                questions.append(p)
-
-        return questions
-
-
-    def parse_single_question(self, block):
-
-        lines = [x.strip() for x in block.split("\n") if x.strip()]
-
-        if len(lines) < 2:
-            return None
-
-        question = ""
-        options = []
-        answer = None
-
-        option_started = False
-
-        for line in lines:
-
-            if re.match(r'^\(?[A-Da-d]\)', line):
-
-                option_started = True
-                options.append(line)
-
-            elif re.match(r'^[A-Da-d][\.\)]', line):
-
-                option_started = True
-                options.append(line)
-
-            elif line.lower().startswith("answer"):
-
-                m = re.search(r'[A-D]', line,re.I)
-
-                if m:
-                    answer = m.group().upper()
-
-            else:
-
-                if option_started:
-
-                    if len(options):
-
-                        options[-1] += " " + line
-
-                else:
-
-                    question += " " + line
-
-        return {
-
-            "question": question.strip(),
-
-            "options": options,
-
-            "correct_answer": answer,
-
-            "explanation":""
-
-        }
-            def smart_question_parser(self, text):
-
-        question_blocks = self.split_into_questions(text)
-
-        parsed_questions = []
-
-        for block in question_blocks:
-
-            q = self.parse_single_question(block)
-
-            if q:
-
-                if len(q["options"]) >= 4:
-
-                    parsed_questions.append(q)
-
-        return parsed_questions
-
-
-    def convert_pdf_to_quiz(self, pdf_file):
-
-        text = self.extract_text_from_pdf(pdf_file)
-
-        questions = self.smart_question_parser(text)
-
-        return questions
+if "timer" not in st.session_state:
+    st.session_state.timer=0
