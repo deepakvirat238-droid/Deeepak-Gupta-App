@@ -55,32 +55,47 @@ def apply_premium_testbook_css():
             border-top: 3px solid #4682B4;
             display: inline-block;
             border-radius: 3px 3px 0 0;
-            margin-bottom: 5px;
+            margin-bottom: 0px;
             margin-top: 10px;
         }
 
-        /* Question Display Container Panel */
+        /* Question Display Container Panel - Padding optimized */
         .tcs-question-slate {
             background: #ffffff;
             border: 1px solid #dcdcdc;
-            padding: 25px;
-            min-height: 320px;
+            padding: 20px 20px 10px 20px;
+            min-height: auto;
             border-radius: 4px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+            margin-bottom: 5px;
         }
         
+        .tcs-q-box {
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+        }
+
         .tcs-q-idx {
             font-size: 14px;
             font-weight: bold;
             color: #4682B4;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border-bottom: 1px dashed #e2e8f0;
-            padding-bottom: 6px;
+            padding-bottom: 4px;
         }
         
-        .tcs-q-text { font-size: 16px; color: #222222; font-weight: 500; line-height: 1.5; }
+        .tcs-q-text { font-size: 16px; color: #222222; font-weight: 500; line-height: 1.4; margin-bottom: 0px; }
         
+        /* CSS Hack to reduce space between question container and streamlit radio buttons */
+        div[data-testid="stRadio"] {
+            margin-top: -10px !important;
+            padding-top: 0px !important;
+        }
+        
+        div[data-testid="stRadio"] > label {
+            display: none !important;
+        }
+
         /* Candidate Context Profile Card */
         .tcs-profile-card {
             background: #f8fafc;
@@ -118,8 +133,8 @@ def apply_premium_testbook_css():
         /* Response Status Banner Blocks */
         .status-banner {
             border-radius: 4px;
-            padding: 12px 15px;
-            margin: 15px 0;
+            padding: 10px 15px;
+            margin: 10px 0;
             font-weight: 600;
             font-size: 14px;
         }
@@ -288,9 +303,9 @@ def draw_testbook_palette_slate():
 def render_home_page():
     st.title("🎯 MockTest Pro — Premium CBT Examination Desk")
     st.markdown("""
-    ### 🚀 High Fidelity Testing System Features:
-    * **Rigid Dual Column Component Layout**: Provides rock-solid UI distribution that completely blocks viewport collapse errors on high-resolution tablets.
-    * **Continuous Dynamic Script Execution Render**: Features auto-refresh execution protocols built directly around the primary operational dashboard core clock matrix.
+    ### 🚀 High Accuracy Platform Features:
+    * **Compact Form Layout**: Options stay tightly coupled right underneath the question string body.
+    * **TCS iON Responsive Matrix Panel**: Replicates standard Testbook layout alignments perfectly.
     """)
     st.info("Select **Upload PDF** from the sidebar route matrix to get started.")
 
@@ -314,7 +329,7 @@ def render_upload_page():
                 st.session_state.current_question_index = 0
                 st.session_state.test_submitted = False
                 st.session_state.test_start_time = None
-                st.success(f"Portfolios initialized. Successfully cataloged {len(parsed_qs)} questions inside operational data memory maps.")
+                st.success(f"Portfolios initialized. Successfully cataloged {len(parsed_qs)} questions.")
             else:
                 st.error("Text alignment parsing error anomaly detected.")
 
@@ -343,7 +358,7 @@ def render_practice_page():
         opts = [f"A. {q['A']}", f"B. {q['B']}", f"C. {q['C']}", f"D. {q['D']}"]
         curr_sel = ["A", "B", "C", "D"].index(q["user_answer"]) if q["user_answer"] else None
         
-        selected_option = st.radio("Choose the correct option:", opts, index=curr_sel, key=f"scr_pr_{q_idx}")
+        selected_option = st.radio("Options Hidden Label:", opts, index=curr_sel, key=f"scr_pr_{q_idx}")
         
         if selected_option:
             ans_char = selected_option[0]
@@ -390,7 +405,6 @@ def render_mock_page():
         st.session_state.current_page = "Result"
         st.rerun()
         
-    # Injecting the Premium Live Testbook Interactive Top Nav Bar Container Module
     st.markdown(f"""
     <div class="testbook-top-bar">
         <span>📋 Online Computer Based Test (CBT Panel Sandbox Workspace)</span>
@@ -418,7 +432,7 @@ def render_mock_page():
         opts = [f"A. {q['A']}", f"B. {q['B']}", f"C. {q['C']}", f"D. {q['D']}"]
         curr_sel = ["A", "B", "C", "D"].index(q["user_answer"]) if q["user_answer"] else None
         
-        selected_option = st.radio("Choose Option Select Parameters:", opts, index=curr_sel, key=f"scr_mk_{q_idx}")
+        selected_option = st.radio("Options Hidden Label:", opts, index=curr_sel, key=f"scr_mk_{q_idx}")
         
         st.write("---")
         act_1, act_2, act_3, act_4 = st.columns(4)
@@ -459,7 +473,6 @@ def render_mock_page():
     with col_control:
         draw_testbook_palette_slate()
 
-    # Dynamic continuous structural clock tracking mechanism to drive live tick rates seamlessly
     if not st.session_state.test_submitted:
         time.sleep(1.0)
         st.rerun()
@@ -495,7 +508,7 @@ def render_settings_page():
         "Modify Default Session Countdown limits span parameter (Minutes Allocation Bound Loop):",
         min_value=5, max_value=200, value=st.session_state.test_duration_minutes
     )
-    st.success("Global config framework states modified securely down localized channels.")
+    st.success("Global config framework states modified securely.")
 
 # ==========================================
 # 6. APPLICATION ROUTER DESK INITIALIZER
@@ -508,7 +521,7 @@ def main():
     st.sidebar.write("---")
     
     selected_portal_route = st.sidebar.radio(
-        "Application Navigation Panel Link Selector Panel Matrix Route:",
+        "Application Navigation Panel Selector Panel Matrix Route:",
         ["Home", "Upload PDF", "Practice Mode", "Mock Test", "Result", "Settings"]
     )
     
@@ -529,3 +542,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
