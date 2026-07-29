@@ -1,4 +1,11 @@
 import streamlit as st
+import pdfplumber
+import re
+import time
+
+# ===========================
+# PAGE CONFIG
+# ===========================
 
 st.set_page_config(
     page_title="MockTest Pro",
@@ -6,35 +13,63 @@ st.set_page_config(
     layout="wide"
 )
 
+# ===========================
+# SESSION STATE
+# ===========================
+
+defaults = {
+    "pdf_loaded": False,
+    "questions": [],
+    "answers": [],
+    "current": 0,
+    "mode": None,
+    "user_answers": {},
+    "review": set(),
+    "timer_start": None
+}
+
+for key, value in defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = value
+
+# ===========================
+# SIDEBAR
+# ===========================
+
 st.sidebar.title("📝 MockTest Pro")
 
-page = st.sidebar.radio(
-    "Navigation",
+menu = st.sidebar.radio(
+    "Menu",
     [
         "📂 Upload PDF",
         "🎯 Practice Mode",
         "📝 Mock Test",
-        "📊 Result",
-        "⚙ Settings"
+        "📊 Result"
     ]
 )
 
-if page == "📂 Upload PDF":
-    st.title("📂 Upload PDF")
-    st.write("Upload your MCQ PDF to create a test.")
+st.sidebar.divider()
 
-elif page == "🎯 Practice Mode":
-    st.title("🎯 Practice Mode")
-    st.info("No PDF loaded.")
+if st.session_state["pdf_loaded"]:
+    st.sidebar.success("✅ PDF Loaded")
+else:
+    st.sidebar.warning("❌ No PDF")
 
-elif page == "📝 Mock Test":
-    st.title("📝 Mock Test")
-    st.info("No PDF loaded.")
+# ===========================
+# UPLOAD PAGE
+# ===========================
 
-elif page == "📊 Result":
-    st.title("📊 Result")
-    st.info("No result available.")
+if menu == "📂 Upload PDF":
 
-elif page == "⚙ Settings":
-    st.title("⚙ Settings")
-    st.info("Settings page.")
+    st.title("📂 Upload MCQ PDF")
+
+    uploaded = st.file_uploader(
+        "Choose PDF",
+        type=["pdf"]
+    )
+
+    if uploaded:
+        st.success("PDF uploaded successfully.")
+
+        if st.button("Read PDF"):
+            st.info("PDF reading will be added in Part 2.")
