@@ -13,7 +13,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# 1. PREMIUM EXACT TESTBOOK CBT SIMULATOR CSS
+# 1. ACTUAL PREMIUM TESTBOOK CBT PORTAL CSS
 # ==========================================
 def apply_premium_testbook_css():
     st.markdown("""
@@ -21,38 +21,7 @@ def apply_premium_testbook_css():
         /* Force App Base background match */
         .main { background-color: #f1f3f5 !important; padding: 0px !important; }
         
-        /* TCS iON Rigid Dual-Pane Container Architecture for Tablets */
-        .tcs-cbt-wrapper {
-            display: flex;
-            flex-direction: row;
-            gap: 15px;
-            width: 100%;
-            margin-top: 10px;
-        }
-        
-        /* Left Pane - Pure Question Display Slate */
-        .tcs-question-slate {
-            flex: 3;
-            background: #ffffff;
-            border: 1px solid #dcdcdc;
-            padding: 20px;
-            min-height: 400px;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        /* Right Pane - Strict Sticky Exam Sidebar Controls Matrix */
-        .tcs-palette-slate {
-            flex: 1;
-            background: #ffffff;
-            border: 1px solid #dcdcdc;
-            padding: 15px;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            min-width: 260px;
-        }
-        
-        /* TCS Top Header Bar Component Blueprint */
+        /* TCS iON Rigid Top Header Bar Component Blueprint */
         .testbook-top-bar {
             background-color: #4682B4;
             color: #ffffff;
@@ -63,6 +32,17 @@ def apply_premium_testbook_css():
             justify-content: space-between;
             align-items: center;
             border-bottom: 3px solid #2a5d84;
+        }
+
+        .timer-badge {
+            background-color: #ffeeb5;
+            color: #856404;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 16px;
+            border: 1px solid #ffe8a1;
+            font-weight: bold;
         }
         
         /* Segment Title Header Tab */
@@ -76,21 +56,30 @@ def apply_premium_testbook_css():
             display: inline-block;
             border-radius: 3px 3px 0 0;
             margin-bottom: 5px;
+            margin-top: 10px;
         }
 
-        /* Question Frame Styling Specifications */
-        .tcs-q-box {
-            border-bottom: 1px solid #f0f0f0;
-            padding-bottom: 15px;
+        /* Question Display Container Panel */
+        .tcs-question-slate {
+            background: #ffffff;
+            border: 1px solid #dcdcdc;
+            padding: 25px;
+            min-height: 320px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             margin-bottom: 20px;
         }
+        
         .tcs-q-idx {
             font-size: 14px;
             font-weight: bold;
-            color: #333333;
-            margin-bottom: 8px;
+            color: #4682B4;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 6px;
         }
-        .tcs-q-text { font-size: 15px; color: #222222; font-weight: 500; }
+        
+        .tcs-q-text { font-size: 16px; color: #222222; font-weight: 500; line-height: 1.5; }
         
         /* Candidate Context Profile Card */
         .tcs-profile-card {
@@ -109,13 +98,13 @@ def apply_premium_testbook_css():
             margin-bottom: 15px;
             border-collapse: collapse;
         }
-        .tcs-stats-table td { padding: 4px; border: 1px solid #f0f0f0; text-align: left; }
+        .tcs-stats-table td { padding: 6px; border: 1px solid #e2e8f0; text-align: left; }
         .tcs-indicator-dot {
             display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            margin-right: 5px;
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            margin-right: 6px;
             vertical-align: middle;
         }
         
@@ -124,7 +113,6 @@ def apply_premium_testbook_css():
             border-radius: 3px !important;
             font-size: 13px !important;
             font-weight: 500 !important;
-            transition: all 0.2s;
         }
         
         /* Response Status Banner Blocks */
@@ -200,7 +188,6 @@ def parse_questions(text, answer_key):
     if not text:
         return questions_list
 
-    # Normalized structural parsing hook splitting questions
     q_split_pattern = r'(?:\n|\A)(?:Q(?:uestion)?\s*\.?\s*)?(\d+)[\.\)]\s+'
     parts = re.split(q_split_pattern, text)
     
@@ -211,14 +198,13 @@ def parse_questions(text, answer_key):
         q_num = int(parts[i])
         q_body = parts[i+1]
         
-        # Highly precise inline capture for loose option blocks (like A Mars B venus)
         opt_pattern = re.compile(
             r'(?:[\n\s]|\A)(?:[\(\[]?)([A-E])(?:[\.\)\]]|\s+)\s*([\s\S]*?)(?=(?:[\n\s]|\A)(?:[\(\[]?)[B-E](?:[\.\)\]]|\s+)|$)',
             re.IGNORECASE
         )
         
         opts_found = opt_pattern.findall(q_body)
-        opts_dict = {'A': 'Option A Content Template', 'B': 'Option B Content Template', 'C': 'Option C Content Template', 'D': 'Option D Content Template'}
+        opts_dict = {'A': 'Option A Content', 'B': 'Option B Content', 'C': 'Option C Content', 'D': 'Option D Content'}
         
         first_opt_idx = re.search(r'(?:[\n\s]|\A)(?:[\(\[]?)[A-E](?:[\.\)\]]|\s+)', q_body, re.IGNORECASE)
         actual_question = q_body[:first_opt_idx.start()].strip() if first_opt_idx else q_body.strip()
@@ -242,10 +228,9 @@ def parse_questions(text, answer_key):
     return sorted(questions_list, key=lambda x: x["question_number"])
 
 # ==========================================
-# 4. FIXED SIDEBAR SLATE ARCHITECTURE COMPONENT
+# 4. FIXED PALETTE METRICS COMPONENT
 # ==========================================
 def draw_testbook_palette_slate():
-    """Compiles the actual Right Palette view box metrics cleanly."""
     answered = sum(1 for q in st.session_state.questions if q["user_answer"] is not None and not q["review"])
     marked_review = sum(1 for q in st.session_state.questions if q["review"])
     not_visited = len(st.session_state.questions) - len(st.session_state.visited_questions)
@@ -253,9 +238,9 @@ def draw_testbook_palette_slate():
 
     st.markdown(f"""
     <div class="tcs-profile-card">
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="50" style="border-radius:50%; margin-bottom:5px;"><br/>
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="55" style="border-radius:50%; margin-bottom:5px;"><br/>
         <span style="font-size:13px; font-weight:bold; color:#2c3e50;">Kanchan Kumari</span><br/>
-        <span style="font-size:11px; color:#7f8c8d;">ID: 2026-CBT</span>
+        <span style="font-size:11px; color:#7f8c8d;">ID: Testbook-2026</span>
     </div>
     <table class="tcs-stats-table">
         <tr>
@@ -264,10 +249,10 @@ def draw_testbook_palette_slate():
         </tr>
         <tr>
             <td><span class="tcs-indicator-dot" style="background:#6f42c1;"></span> Review: <b>{marked_review}</b></td>
-            <td><span class="tcs-indicator-dot" style="background:#e9ecef; border:1px solid #ccc;"></span> Visited: <b>{len(st.session_state.visited_questions)}</b></td>
+            <td><span class="tcs-indicator-dot" style="background:#e9ecef; border:1px solid #ccc;"></span> Not Visited: <b>{not_visited}</b></td>
         </tr>
     </table>
-    <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:#34495e;">Question Navigation Matrix:</div>
+    <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:#34495e;">Question Navigation Palette:</div>
     """, unsafe_allow_html=True)
     
     total_qs = len(st.session_state.questions)
@@ -281,7 +266,6 @@ def draw_testbook_palette_slate():
                 q = st.session_state.questions[idx]
                 q_num = q["question_number"]
                 
-                # Dynamic indicator symbols matching exact CBT state profiles
                 badge = "⬜"
                 if idx == st.session_state.current_question_index:
                     badge = "🔵"
@@ -299,23 +283,23 @@ def draw_testbook_palette_slate():
                         st.rerun()
 
 # ==========================================
-# 5. WORKFLOW BOARD LAYOUT PAGES ROUTER
+# 5. CORE WORKFLOW INTEGRATION ROUTERS
 # ==========================================
 def render_home_page():
-    st.title("🎯 MockTest Pro — Elite Platform Panel")
+    st.title("🎯 MockTest Pro — Premium CBT Examination Desk")
     st.markdown("""
-    ### 💻 Production Matrix Overview:
-    * **Rigid Split Layout Matrix**: Blocks automatic scaling failures across widescreen tablet models.
-    * **High Efficiency Engine**: Instant tracking configuration parsing maps.
+    ### 🚀 High Fidelity Testing System Features:
+    * **Rigid Dual Column Component Layout**: Provides rock-solid UI distribution that completely blocks viewport collapse errors on high-resolution tablets.
+    * **Continuous Dynamic Script Execution Render**: Features auto-refresh execution protocols built directly around the primary operational dashboard core clock matrix.
     """)
-    st.info("Choose **Upload PDF** inside your dashboard portal sidebar route matrix to open files.")
+    st.info("Select **Upload PDF** from the sidebar route matrix to get started.")
 
 def render_upload_page():
-    st.subheader("📂 Ingest MCQ Core Blueprint Sheets")
-    uploaded_file = st.file_uploader("Select Exam Asset Stream Document Target (PDF Spec):", type=["pdf"])
+    st.subheader("📂 Ingest Exam Document Object (PDF)")
+    uploaded_file = st.file_uploader("Upload MCQ Exam Sheet Matrix Blueprint Asset:", type=["pdf"])
     
     if uploaded_file is not None:
-        with st.spinner("Decoding internal page objects..."):
+        with st.spinner("Decoding layout structures..."):
             q_text, ans_text, err = extract_pdf_data(uploaded_file)
             if err:
                 st.error(err)
@@ -330,9 +314,9 @@ def render_upload_page():
                 st.session_state.current_question_index = 0
                 st.session_state.test_submitted = False
                 st.session_state.test_start_time = None
-                st.success(f"Portfolios initialized. Successfully cataloged {len(parsed_qs)} questions inside active session layers.")
+                st.success(f"Portfolios initialized. Successfully cataloged {len(parsed_qs)} questions inside operational data memory maps.")
             else:
-                st.error("Text alignment scanning boundary breakdown. Check data delimiters formatting structure configuration rules.")
+                st.error("Text alignment parsing error anomaly detected.")
 
 def render_practice_page():
     if not st.session_state.questions:
@@ -344,7 +328,6 @@ def render_practice_page():
     
     st.markdown('<div class="tcs-section-badge">Active Section: Real-time Practice Engine</div>', unsafe_allow_html=True)
     
-    # Unified horizontal row constraint wrapper to force layout matching across tablet bounds
     col_slate, col_control = st.columns([2.8, 1.2])
     
     with col_slate:
@@ -360,7 +343,7 @@ def render_practice_page():
         opts = [f"A. {q['A']}", f"B. {q['B']}", f"C. {q['C']}", f"D. {q['D']}"]
         curr_sel = ["A", "B", "C", "D"].index(q["user_answer"]) if q["user_answer"] else None
         
-        selected_option = st.radio("Choose the correct choice vector node:", opts, index=curr_sel, key=f"scr_pr_{q_idx}")
+        selected_option = st.radio("Choose the correct option:", opts, index=curr_sel, key=f"scr_pr_{q_idx}")
         
         if selected_option:
             ans_char = selected_option[0]
@@ -407,12 +390,15 @@ def render_mock_page():
         st.session_state.current_page = "Result"
         st.rerun()
         
+    # Injecting the Premium Live Testbook Interactive Top Nav Bar Container Module
     st.markdown(f"""
     <div class="testbook-top-bar">
-        <span>📋 Mock CBT Exam Center Pane Workspace Terminal</span>
-        <span>⏳ Time Remaining Check: {str(timedelta(seconds=int(remaining_secs)))}</span>
+        <span>📋 Online Computer Based Test (CBT Panel Sandbox Workspace)</span>
+        <div>⏳ Time Remaining: <span class="timer-badge">{str(timedelta(seconds=int(remaining_secs)))}</span></div>
     </div>
     """, unsafe_allow_html=True)
+    
+    st.markdown('<div class="tcs-section-badge">Section 1: Core Content Assessment Major Sheet</div>', unsafe_allow_html=True)
     
     q_idx = st.session_state.current_question_index
     q = st.session_state.questions[q_idx]
@@ -464,7 +450,7 @@ def render_mock_page():
                 st.rerun()
                 
         with act_4:
-            if st.button("🛑 Submit Portfolio", use_container_width=True, key="mk_sub_b"):
+            if st.button("🛑 Submit Test Panel Portfolio", use_container_width=True, key="mk_sub_b"):
                 st.session_state.test_submitted = True
                 st.session_state.time_taken_seconds = elapsed
                 st.session_state.current_page = "Result"
@@ -473,8 +459,13 @@ def render_mock_page():
     with col_control:
         draw_testbook_palette_slate()
 
+    # Dynamic continuous structural clock tracking mechanism to drive live tick rates seamlessly
+    if not st.session_state.test_submitted:
+        time.sleep(1.0)
+        st.rerun()
+
 def render_result_page():
-    st.subheader("📊 Performance Diagnostic Summary Matrix Studio")
+    st.subheader("📊 Performance Diagnostics Summary Matrix Studio")
     
     if not st.session_state.questions or not st.session_state.test_submitted:
         st.warning("No comprehensive test submission log contexts located.")
@@ -493,7 +484,7 @@ def render_result_page():
             
     accuracy = (correct / (correct + wrong) * 100) if (correct + wrong) > 0 else 0
     
-    st.metric("Total Extracted Assessment Nodes", total_q)
+    st.metric("Total Extracted Assessment Items", total_q)
     st.metric("Verified Valid Core Hits", correct)
     st.metric("Engine Precision Accuracy Index Factor", f"{accuracy:.2f}%")
     st.metric("Total Operational Test Session Runtime", str(timedelta(seconds=int(st.session_state.time_taken_seconds))))
@@ -538,4 +529,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
