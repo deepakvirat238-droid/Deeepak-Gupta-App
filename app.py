@@ -4,16 +4,16 @@ import re
 import time
 from datetime import timedelta
 
-# Streamlit configurations for matching structural dashboard metrics
+# Tablet aur Mobile compatibility ke liye layout setting adjust ki gyi hai
 st.set_page_config(
-    page_title="MockTest Pro — Premium CBT Examination Suite",
+    page_title="MockTest Pro — Tablet Responsive CBT Suite",
     page_icon="📝",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # ==========================================
-# 1. ACTUAL TESTBOOK / TCS iON CBT PANE CSS
+# 1. TABLET & MOBILE RESPONSIVE CSS
 # ==========================================
 def apply_testbook_theme():
     st.markdown("""
@@ -21,49 +21,54 @@ def apply_testbook_theme():
         /* Base Styling & Font Set */
         .main { background-color: #f4f7f9 !important; padding-top: 0px !important; }
         
-        /* TCS iON Examination Top Banner */
+        /* TCS iON Top Banner - Responsive for Tablets */
         .cbt-top-bar {
             background-color: #4682B4;
             color: white;
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 10px 15px;
+            font-size: 14px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 3px solid #315b7d;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         /* Section Header Layout */
         .section-tab {
             background-color: #e7f1f9;
             color: #1e4f75;
-            padding: 8px 20px;
+            padding: 6px 15px;
             font-weight: bold;
             border-top: 3px solid #4682B4;
             display: inline-block;
             margin-bottom: 10px;
             border-radius: 4px 4px 0 0;
+            font-size: 13px;
         }
 
-        /* Question Canvas View Box */
+        /* Question Canvas View Box (Tablet Optimization) */
         .q-container {
             background-color: #ffffff;
             border: 1px solid #cfdadf;
-            padding: 20px;
-            min-height: 250px;
-            margin-bottom: 15px;
+            padding: 15px;
+            min-height: 200px;
+            margin-bottom: 12px;
             border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .q-number-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             color: #333;
             border-bottom: 1px solid #eaeaea;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
+            padding-bottom: 6px;
+            margin-bottom: 10px;
         }
         
         /* Sidebar Identity Panel Mock */
@@ -72,31 +77,33 @@ def apply_testbook_theme():
             border: 1px solid #cfdadf;
             padding: 10px;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             border-radius: 4px;
         }
         
-        /* Real Palette Status Tags styling mapping */
+        /* Palette Status Summary Grid */
         .status-summary-table {
             width: 100%;
-            font-size: 12px;
-            margin-bottom: 15px;
+            font-size: 11px;
+            margin-bottom: 12px;
             border-collapse: collapse;
         }
-        .status-summary-table td { padding: 4px 2px; }
+        .status-summary-table td { padding: 3px 2px; }
         
-        /* Custom Native Button Overrides for Testbook Colors */
+        /* Tablet Friendly Buttons Override */
         div.stButton > button {
             border-radius: 2px !important;
-            font-size: 13px !important;
+            font-size: 12px !important;
+            padding: 6px 10px !important;
         }
         
-        /* Dynamic Indicator Badges */
+        /* Feedback Alert Layouts */
         .feedback-box {
             border-radius: 4px;
-            padding: 15px;
-            margin: 15px 0;
+            padding: 12px;
+            margin: 12px 0;
             font-weight: 500;
+            font-size: 13px;
         }
         .feedback-success { background-color: #e8f5e9; color: #2e7d32; border-left: 5px solid #4caf50; }
         .feedback-danger { background-color: #ffebee; color: #c62828; border-left: 5px solid #f44336; }
@@ -104,7 +111,7 @@ def apply_testbook_theme():
     """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. SESSION STATE MANAGEMENT
+# 2. SESSION STATE ARTIFACT MANAGEMENT
 # ==========================================
 def init_session_state():
     if 'current_page' not in st.session_state:
@@ -127,15 +134,14 @@ def init_session_state():
         st.session_state.visited_questions = set()
 
 # ==========================================
-# 3. ADVANCED HIGH-ACCURACY PARSING ENGINE
+# 3. ROBUST PARSING ENGINE
 # ==========================================
 def extract_pdf_data(uploaded_file):
-    """Robust raw layout reader isolating question block sheets from target metrics keys."""
     try:
         with pdfplumber.open(uploaded_file) as pdf:
             total_pages = len(pdf.pages)
             if total_pages < 2:
-                return None, None, "PDF requires multiple pages to process structurally (Questions + Answer Key)."
+                return None, None, "PDF requires multiple pages (Questions + Answer Key)."
             
             question_text = ""
             for page in pdf.pages[:-1]:
@@ -149,35 +155,21 @@ def extract_pdf_data(uploaded_file):
         return None, None, f"Parsing exception error discovered: {str(e)}"
 
 def parse_answer_key(text):
-    """
-    High-accuracy key mapper targeting multiple formats:
-    1.B | 1. B | 1-B | 1)B | Q1 B
-    """
     answers = {}
     if not text:
         return answers
-    
-    # Pre-clean known layout noise headers
     clean_text = re.sub(r'(ANSWER\s*KEY|Ans[:\s]*|Answer\s*Sheet)', '', text, flags=re.IGNORECASE)
-    
-    # Matches digit index boundaries mapping straight to options selection matrices
     pattern = re.compile(r'(?:Q(?:uestion)?\s*)?(\d+)\s*[\.\-\)\:\s]*\s*([A-E])', re.IGNORECASE)
     matches = pattern.findall(clean_text)
-    
     for num, option in matches:
         answers[int(num)] = option.upper().strip()
     return answers
 
 def parse_questions(text, answer_key):
-    """
-    High-accuracy multi-line parser. Detects option delimiters smoothly
-    even if spaces/periods are completely missing (e.g. 'A Mars', 'B venus').
-    """
     questions_list = []
     if not text:
         return questions_list
 
-    # Splits cleanly on standard variations of Question markers: Q1., Q 1., 1., 1), Question 1
     q_split_pattern = r'(?:\n|\A)(?:Q(?:uestion)?\s*\.?\s*)?(\d+)[\.\)]\s+'
     parts = re.split(q_split_pattern, text)
     
@@ -188,7 +180,6 @@ def parse_questions(text, answer_key):
         q_num = int(parts[i])
         q_body = parts[i+1]
         
-        # Super dynamic regex catching standard Option groups with space/non-dot lookaheads
         opt_pattern = re.compile(
             r'(?:[\n\s]|\A)(?:[\(\[]?)([A-E])(?:[\.\)\]]|\s+)\s*([\s\S]*?)(?=(?:[\n\s]|\A)(?:[\(\[]?)[B-E](?:[\.\)\]]|\s+)|$)',
             re.IGNORECASE
@@ -197,14 +188,11 @@ def parse_questions(text, answer_key):
         opts_found = opt_pattern.findall(q_body)
         opts_dict = {'A': 'Option A', 'B': 'Option B', 'C': 'Option C', 'D': 'Option D', 'E': ''}
         
-        # Calculate start boundaries to securely isolate the core base prompt question string text block
         first_opt_idx = re.search(r'(?:[\n\s]|\A)(?:[\(\[]?)[A-E](?:[\.\)\]]|\s+)', q_body, re.IGNORECASE)
         actual_question = q_body[:first_opt_idx.start()].strip() if first_opt_idx else q_body.strip()
         
         for letter, content in opts_found:
-            cleaned_content = content.strip()
-            # Clean up line break garbage formatting leftovers
-            cleaned_content = re.sub(r'\s+', ' ', cleaned_content)
+            cleaned_content = re.sub(r'\s+', ' ', content.strip())
             opts_dict[letter.upper()] = cleaned_content
             
         questions_list.append({
@@ -214,7 +202,7 @@ def parse_questions(text, answer_key):
             "B": opts_dict['B'],
             "C": opts_dict['C'],
             "D": opts_dict['D'],
-            "correct_answer": answer_key.get(q_num, "A"),  # Defaults safely if missing mapping node
+            "correct_answer": answer_key.get(q_num, "A"),
             "user_answer": None,
             "review": False
         })
@@ -222,9 +210,10 @@ def parse_questions(text, answer_key):
     return sorted(questions_list, key=lambda x: x["question_number"])
 
 # ==========================================
-# 4. COMPACT NAV PALETTE ENGINE
+# 4. FIXED PALETTE LAYOUT (TABLET DRIVEN)
 # ==========================================
-def render_sidebar_palette():
+def render_exam_palette():
+    """Renders the question palette inside a unified layout block container."""
     answered = sum(1 for q in st.session_state.questions if q["user_answer"] is not None and not q["review"])
     marked_review = sum(1 for q in st.session_state.questions if q["review"])
     not_visited = len(st.session_state.questions) - len(st.session_state.visited_questions)
@@ -232,26 +221,23 @@ def render_sidebar_palette():
 
     st.markdown(f"""
     <div class="profile-box">
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="55" style="margin-bottom:5px;"><br/>
-        <b>Kanchan Kumari</b><br/><span style="font-size:11px;color:grey;">Roll No: 2026045</span>
+        <b>Exam Grid Controls</b>
     </div>
     <table class="status-summary-table">
         <tr>
-            <td><span style="background:#28a745;color:white;padding:2px 6px;font-weight:bold;border-radius:2px;">{answered}</span> Answered</td>
-            <td><span style="background:#dc3545;color:white;padding:2px 6px;font-weight:bold;border-radius:2px;">{not_answered}</span> Not Answered</td>
+            <td><span style="background:#28a745;color:white;padding:2px 4px;font-weight:bold;">{answered}</span> Ans</td>
+            <td><span style="background:#dc3545;color:white;padding:2px 4px;font-weight:bold;">{not_answered}</span> Unans</td>
         </tr>
         <tr>
-            <td><span style="background:#6f42c1;color:white;padding:2px 6px;font-weight:bold;border-radius:2px;">{marked_review}</span> Marked Review</td>
-            <td><span style="background:#e9ecef;color:#495057;padding:2px 6px;font-weight:bold;border-radius:2px;">{not_visited}</span> Not Visited</td>
+            <td><span style="background:#6f42c1;color:white;padding:2px 4px;font-weight:bold;">{marked_review}</span> Review</td>
+            <td><span style="background:#e9ecef;color:#495057;padding:2px 4px;font-weight:bold;">{not_visited}</span> Not Visited</td>
         </tr>
     </table>
     """, unsafe_allow_html=True)
     
-    st.markdown("---")
-    st.write("🎰 **Question Palette Grid:**")
-    
     total_qs = len(st.session_state.questions)
-    grid_cols = 4
+    grid_cols = 4  # Adjusted grid size for crisp distribution across screens
+    
     for i in range(0, total_qs, grid_cols):
         cols = st.columns(grid_cols)
         for j in range(grid_cols):
@@ -271,32 +257,27 @@ def render_sidebar_palette():
                     status_symbol = "🔴"
                     
                 with cols[j]:
-                    if st.button(f"{status_symbol}{q_num}", key=f"cbt_pal_{idx}", use_container_width=True):
+                    if st.button(f"{status_symbol}{q_num}", key=f"tbl_pal_{idx}", use_container_width=True):
                         st.session_state.current_question_index = idx
                         st.session_state.visited_questions.add(idx)
                         st.rerun()
 
 # ==========================================
-# 5. CORE WORKFLOW INTEGRATION ROUTERS
+# 5. WORKFLOW PAGES
 # ==========================================
 def render_home_page():
-    st.title("🎯 MockTest Pro — Premium Exam Portal")
+    st.title("🎯 MockTest Pro — Universal Engine")
     st.markdown("""
-    Welcome to India's most accurate and authentic CBT simulation desk framework.
-    
-    ### 🚀 High Accuracy Architecture:
-    * **Spatial Parsing Architecture**: Captures flat spacing choice configurations like `A Mars` without throwing breaking text faults.
-    * **TCS iON Responsive Matrix Panel**: Replicates standard Testbook layout alignments perfectly.
-    * **Integrated Dual Run Engine Modules**: Switch instantly to fit custom execution routines.
+    Optimized responsive CBT execution node dashboard interface engine.
     """)
-    st.info("Please navigate to the **Upload PDF** section using the left-hand navigation menu matrix.")
+    st.info("Select **Upload PDF** from the navigation controls panel to initialize.")
 
 def render_upload_page():
-    st.subheader("📂 Document Asset Framework Ingestion Center")
-    uploaded_file = st.file_uploader("Upload MCQ Document Data Blueprint (PDF Asset)", type=["pdf"])
+    st.subheader("📂 Ingest Exam Document Object (PDF)")
+    uploaded_file = st.file_uploader("Upload MCQ Exam Sheet Matrix:", type=["pdf"])
     
     if uploaded_file is not None:
-        with st.spinner("Analyzing structural layouts and tracking options grids..."):
+        with st.spinner("Analyzing document mapping architectures..."):
             q_text, ans_text, err = extract_pdf_data(uploaded_file)
             if err:
                 st.error(err)
@@ -311,65 +292,63 @@ def render_upload_page():
                 st.session_state.current_question_index = 0
                 st.session_state.test_submitted = False
                 st.session_state.test_start_time = None
-                st.success(f"Processing Complete! Successfully mapped {len(parsed_qs)} evaluation nodes inside localized memory spaces.")
+                st.success(f"Success! {len(parsed_qs)} questions loaded efficiently into memory targets.")
             else:
-                st.error("Failed to map separate questions. Ensure your asset contains sequential digit numbering markers.")
+                st.error("Regex validation format error. Ensure standard numbering formats are used.")
 
 def render_practice_page():
     if not st.session_state.questions:
-        st.warning("No functional datasets loaded. Ingest an item portfolio first using the **Upload PDF** engine route.")
+        st.warning("Please upload a valid data asset stream matrix first.")
         return
         
     q_idx = st.session_state.current_question_index
     q = st.session_state.questions[q_idx]
     
-    st.markdown('<div class="section-tab">Section Workspace: General Performance Booster Practice</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-tab">Workspace Section: Tablet View Practice Suite</div>', unsafe_allow_html=True)
     
-    col_left, col_right = st.columns([3, 1])
+    # Render layout sequentially without unsafe horizontal grid splits to prevent tablet breaks
+    st.markdown(f"""
+    <div class="q-container">
+        <div class="q-number-title">Question No. {q['question_number']}</div>
+        <p style='font-size:15px;'><b>{q['question']}</b></p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    with col_left:
-        st.markdown(f"""
-        <div class="q-container">
-            <div class="q-number-title">Question No. {q['question_number']}</div>
-            <p style='font-size:15px;'><b>{q['question']}</b></p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        opts = [f"A. {q['A']}", f"B. {q['B']}", f"C. {q['C']}", f"D. {q['D']}"]
-        curr_sel = ["A", "B", "C", "D"].index(q["user_answer"]) if q["user_answer"] else None
-        
-        selected_option = st.radio("Choose option select input node variant:", opts, index=curr_sel, key=f"p_rad_{q_idx}")
-        
-        if selected_option:
-            ans_char = selected_option[0]
-            st.session_state.questions[q_idx]["user_answer"] = ans_char
-            if ans_char == q["correct_answer"]:
-                st.markdown('<div class="feedback-box feedback-success">✔ Correct Selection Verified!</div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div class="feedback-box feedback-danger">✘ Incorrect choice coordinate. Core target key value is: <b>Option {q["correct_answer"]}</b></div>', unsafe_allow_html=True)
-                
-        st.write("---")
-        b1, b2, b3 = st.columns(3)
-        with b1:
-            if st.button("⬅ Previous Item", disabled=(q_idx == 0), use_container_width=True, key="prac_prev"):
-                st.session_state.current_question_index -= 1
-                st.rerun()
-        with b2:
-            if st.button("🧹 Reset Target Node", use_container_width=True, key="prac_clear"):
-                st.session_state.questions[q_idx]["user_answer"] = None
-                st.rerun()
-        with b3:
-            if st.button("Save & Forward ➡", disabled=(q_idx == len(st.session_state.questions) - 1), use_container_width=True, key="prac_next"):
-                st.session_state.current_question_index += 1
-                st.session_state.visited_questions.add(st.session_state.current_question_index)
-                st.rerun()
+    opts = [f"A. {q['A']}", f"B. {q['B']}", f"C. {q['C']}", f"D. {q['D']}"]
+    curr_sel = ["A", "B", "C", "D"].index(q["user_answer"]) if q["user_answer"] else None
+    
+    selected_option = st.radio("Select Choice Coordinate Node Input:", opts, index=curr_sel, key=f"t_p_rad_{q_idx}")
+    
+    if selected_option:
+        ans_char = selected_option[0]
+        st.session_state.questions[q_idx]["user_answer"] = ans_char
+        if ans_char == q["correct_answer"]:
+            st.markdown('<div class="feedback-box feedback-success">✔ Correct Assessment Node Registered.</div>', unsafe_allow_html=True)
+        else:
+            st.markdown(f'<div class="feedback-box feedback-danger">✘ Incorrect choice coordinate. Core target key value is: <b>Option {q["correct_answer"]}</b></div>', unsafe_allow_html=True)
+            
+    st.write("---")
+    b1, b2, b3 = st.columns(3)
+    with b1:
+        if st.button("⬅ Previous", disabled=(q_idx == 0), use_container_width=True, key="t_pr_b"):
+            st.session_state.current_question_index -= 1
+            st.rerun()
+    with b2:
+        if st.button("🧹 Clear", use_container_width=True, key="t_pr_c"):
+            st.session_state.questions[q_idx]["user_answer"] = None
+            st.rerun()
+    with b3:
+        if st.button("Save & Next ➡", disabled=(q_idx == len(st.session_state.questions) - 1), use_container_width=True, key="t_pr_n"):
+            st.session_state.current_question_index += 1
+            st.session_state.visited_questions.add(st.session_state.current_question_index)
+            st.rerun()
 
-    with col_right:
-        render_sidebar_palette()
+    st.write("---")
+    render_exam_palette()
 
 def render_mock_page():
     if not st.session_state.questions:
-        st.warning("No functional datasets loaded. Ingest an item portfolio first using the **Upload PDF** engine route.")
+        st.warning("Please upload a valid data asset stream matrix first.")
         return
         
     if st.session_state.test_start_time is None:
@@ -385,79 +364,72 @@ def render_mock_page():
         st.session_state.current_page = "Result"
         st.rerun()
         
-    # Top Information Bar Injection Replication
     st.markdown(f"""
     <div class="cbt-top-bar">
-        <span>📋 Online Examination System Mock Core Workspace Panel</span>
-        <span>⏳ Countdown Running Remaining Clock: {str(timedelta(seconds=int(rem_sec)))}</span>
+        <span>📋 Mock Core Mode Workspace</span>
+        <span>⏳ Clock Remaining: {str(timedelta(seconds=int(rem_sec)))}</span>
     </div>
     """, unsafe_allow_html=True)
-    
-    st.markdown('<div class="section-tab">Main Target major Paper Testing Evaluation Section</div>', unsafe_allow_html=True)
     
     q_idx = st.session_state.current_question_index
     q = st.session_state.questions[q_idx]
     
-    col_left, col_right = st.columns([3, 1])
+    st.markdown(f"""
+    <div class="q-container">
+        <div class="q-number-title">Question No. {q['question_number']}</div>
+        <p style='font-size:15px;'><b>{q['question']}</b></p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    with col_left:
-        st.markdown(f"""
-        <div class="q-container">
-            <div class="q-number-title">Question No. {q['question_number']}</div>
-            <p style='font-size:15px;'><b>{q['question']}</b></p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        opts = [f"A. {q['A']}", f"B. {q['B']}", f"C. {q['C']}", f"D. {q['D']}"]
-        curr_sel = ["A", "B", "C", "D"].index(q["user_answer"]) if q["user_answer"] else None
-        
-        selected_option = st.radio("Choose Option Select:", opts, index=curr_sel, key=f"m_rad_{q_idx}")
-        
-        st.write("---")
-        # Standard Action Configuration Matrix Row Placement Layout
-        act_c1, act_c2, act_c3, act_c4 = st.columns(4)
-        
-        with act_c1:
-            if st.button("🟣 Mark for Review & Next", use_container_width=True, key="mock_review"):
-                st.session_state.questions[q_idx]["review"] = True
-                if selected_option:
-                    st.session_state.questions[q_idx]["user_answer"] = selected_option[0]
-                if q_idx < len(st.session_state.questions) - 1:
-                    st.session_state.current_question_index += 1
-                    st.session_state.visited_questions.add(st.session_state.current_question_index)
-                st.rerun()
-                
-        with act_c2:
-            if st.button("🧹 Clear Response", use_container_width=True, key="mock_clear"):
-                st.session_state.questions[q_idx]["user_answer"] = None
-                st.session_state.questions[q_idx]["review"] = False
-                st.rerun()
-                
-        with act_c3:
-            if st.button("💾 Save & Next ➡", type="primary", use_container_width=True, key="mock_next"):
-                if selected_option:
-                    st.session_state.questions[q_idx]["user_answer"] = selected_option[0]
-                st.session_state.questions[q_idx]["review"] = False
-                if q_idx < len(st.session_state.questions) - 1:
-                    st.session_state.current_question_index += 1
-                    st.session_state.visited_questions.add(st.session_state.current_question_index)
-                st.rerun()
-                
-        with act_c4:
-            if st.button("🛑 Submit Evaluation Package", use_container_width=True, key="mock_submit"):
-                st.session_state.test_submitted = True
-                st.session_state.time_taken_seconds = elapsed
-                st.session_state.current_page = "Result"
-                st.rerun()
+    opts = [f"A. {q['A']}", f"B. {q['B']}", f"C. {q['C']}", f"D. {q['D']}"]
+    curr_sel = ["A", "B", "C", "D"].index(q["user_answer"]) if q["user_answer"] else None
+    
+    selected_option = st.radio("Choose Option Select Parameters:", opts, index=curr_sel, key=f"t_m_rad_{q_idx}")
+    
+    st.write("---")
+    act_c1, act_c2, act_c3, act_c4 = st.columns(4)
+    
+    with act_c1:
+        if st.button("🟣 Review & Next", use_container_width=True, key="t_m_rev"):
+            st.session_state.questions[q_idx]["review"] = True
+            if selected_option:
+                st.session_state.questions[q_idx]["user_answer"] = selected_option[0]
+            if q_idx < len(st.session_state.questions) - 1:
+                st.session_state.current_question_index += 1
+                st.session_state.visited_questions.add(st.session_state.current_question_index)
+            st.rerun()
+            
+    with act_c2:
+        if st.button("🧹 Clear Ans", use_container_width=True, key="t_m_clr"):
+            st.session_state.questions[q_idx]["user_answer"] = None
+            st.session_state.questions[q_idx]["review"] = False
+            st.rerun()
+            
+    with act_c3:
+        if st.button("💾 Save & Next ➡", type="primary", use_container_width=True, key="t_m_nxt"):
+            if selected_option:
+                st.session_state.questions[q_idx]["user_answer"] = selected_option[0]
+            st.session_state.questions[q_idx]["review"] = False
+            if q_idx < len(st.session_state.questions) - 1:
+                st.session_state.current_question_index += 1
+                st.session_state.visited_questions.add(st.session_state.current_question_index)
+            st.rerun()
+            
+    with act_c4:
+        if st.button("🛑 End Test Pack", use_container_width=True, key="t_m_sub"):
+            st.session_state.test_submitted = True
+            st.session_state.time_taken_seconds = elapsed
+            st.session_state.current_page = "Result"
+            st.rerun()
 
-    with col_right:
-        render_sidebar_palette()
+    st.write("---")
+    render_exam_palette()
 
 def render_result_page():
-    st.subheader("📊 Performance Analytics Dashboard Studio")
+    st.subheader("📊 Performance Diagnostics Summary Studio")
     
     if not st.session_state.questions or not st.session_state.test_submitted:
-        st.warning("No comprehensive test submission log context discovered to compute tracking metrics.")
+        st.warning("No submission log database node located to trace profiles.")
         return
         
     total_q = len(st.session_state.questions)
@@ -473,36 +445,21 @@ def render_result_page():
             
     accuracy = (correct / (correct + wrong) * 100) if (correct + wrong) > 0 else 0
     
-    r_c1, r_c2, r_c3 = st.columns(3)
-    r_c1.metric("Total Extracted Items", total_q)
-    r_c2.metric("Verified Valid Core Hits", correct)
-    mismatches = r_c3.metric("Error Variance Misses", wrong)
-    
-    r_c4, r_c5 = st.columns(2)
-    r_c4.metric("Engine Precision Index Score", f"{accuracy:.2f}%")
-    r_c5.metric("Total Processing Runtime Allocated", str(timedelta(seconds=int(st.session_state.time_taken_seconds))))
-    
-    st.write("---")
-    st.markdown("### 🔍 Item-by-Item Question & Key Matrix Diagnostic Audit Log")
-    for idx, q in enumerate(st.session_state.questions):
-        with st.expander(f"Question Log Matrix Target Element Entry Record Value #{q['question_number']}"):
-            st.markdown(f"**Question Text Node Context Content:** {q['question']}")
-            st.write(f"A. {q['A']}")
-            st.write(f"B. {q['B']}")
-            st.write(f"C. {q['C']}")
-            st.write(f"D. {q['D']}")
-            st.info(f"Verified System Reference Target Key Parameter: Option {q['correct_answer']} | Active Registration Selection Log Target Node Value: {q['user_answer'] if q['user_answer'] else 'Skipped/No Response Input Logged'}")
+    st.metric("Total Items Ingested", total_q)
+    st.metric("Verified True Node Matches", correct)
+    st.metric("Calculation Accuracy Metrics Factor", f"{accuracy:.2f}%")
+    st.metric("Duration Expended Spans", str(timedelta(seconds=int(st.session_state.time_taken_seconds))))
 
 def render_settings_page():
-    st.subheader("⚙️ System Architecture Configuration Controls")
+    st.subheader("⚙️ Global Settings Portal")
     st.session_state.test_duration_minutes = st.number_input(
-        "Define Session Allocation Parameters Counter Length (Minutes Duration Scale Layout Boundary Loop):",
+        "Set Global Duration Limitations Span Bounds (Minutes Scale):",
         min_value=5, max_value=200, value=st.session_state.test_duration_minutes
     )
-    st.success("Target environment global settings parameters altered successfully.")
+    st.success("Global config framework states modified securely.")
 
 # ==========================================
-# 6. APP MAIN CONTROLLER ENTRY POINT
+# 6. APPLICATION ROUTER ENTRY INITIALIZER
 # ==========================================
 def main():
     apply_testbook_theme()
@@ -511,12 +468,12 @@ def main():
     st.sidebar.markdown("<h2 style='text-align:center; color:#4682B4;'>📝 MockTest Pro</h2>", unsafe_allow_html=True)
     st.sidebar.write("---")
     
-    navigation_panel_matrix_routes = st.sidebar.radio(
-        "Navigation Portal Route Selector Panel Menu Hub:",
+    selected_menu_route = st.sidebar.radio(
+        "Select Operation Panel Workspace Mode:",
         ["Home", "Upload PDF", "Practice Mode", "Mock Test", "Result", "Settings"]
     )
     
-    st.session_state.current_page = navigation_panel_matrix_routes
+    st.session_state.current_page = selected_menu_route
     
     if st.session_state.current_page == "Home":
         render_home_page()
