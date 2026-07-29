@@ -3,9 +3,10 @@ import pdfplumber
 import re
 import time
 
-# =====================================
-# PAGE CONFIG
-# =====================================
+# ======================================
+# MOCKTEST PRO V5
+# PART 1
+# ======================================
 
 st.set_page_config(
     page_title="MockTest Pro",
@@ -13,61 +14,37 @@ st.set_page_config(
     layout="wide"
 )
 
-# =====================================
-# SESSION STATE
-# =====================================
+# ---------- Session State ----------
 
-defaults = {
-    "pdf_loaded": False,
-    "questions": [],
-    "answer_key": {},
-    "current_question": 0,
-    "user_answers": {},
-    "review_questions": [],
-    "mode": "",
-    "pdf_text": "",
-    "answer_text": "",
-    "timer_start": None
-}
+if "app" not in st.session_state:
+    st.session_state.app = {
+        "pdf_loaded": False,
+        "pdf_name": "",
+        "pdf_text": "",
+        "answer_text": "",
+        "questions": [],
+        "answer_key": {},
+        "current": 0,
+        "mode": "",
+        "user_answers": {},
+        "review": [],
+        "score": 0,
+        "start_time": None
+    }
 
-for key, value in defaults.items():
-    if key not in st.session_state:
-        st.session_state[key] = value
+APP = st.session_state.app
 
-# =====================================
-# CUSTOM CSS
-# =====================================
+# ---------- Header ----------
 
-st.markdown("""
-<style>
+st.title("📝 MockTest Pro")
+st.caption("Convert any MCQ PDF into a Testbook Style Mock Test")
 
-.main{
-    padding-top:10px;
-}
-
-.block-container{
-    padding-top:1rem;
-}
-
-.stButton>button{
-    width:100%;
-    border-radius:10px;
-    height:45px;
-    font-weight:bold;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# =====================================
-# SIDEBAR
-# =====================================
-
-st.sidebar.title("📝 MockTest Pro")
+# ---------- Sidebar ----------
 
 menu = st.sidebar.radio(
-    "Select",
+    "Navigation",
     [
+        "🏠 Home",
         "📂 Upload PDF",
         "🎯 Practice Mode",
         "📝 Mock Test",
@@ -75,48 +52,74 @@ menu = st.sidebar.radio(
     ]
 )
 
-st.sidebar.divider()
+# ---------- Home ----------
 
-if st.session_state.pdf_loaded:
-    st.sidebar.success("✅ PDF Loaded")
-else:
-    st.sidebar.warning("❌ No PDF Loaded")
+if menu == "🏠 Home":
 
-# =====================================
-# HOME
-# =====================================
+    st.subheader("Welcome")
 
-if menu == "📂 Upload PDF":
+    st.info(
+        """
+Features
 
-    st.title("📂 Upload MCQ PDF")
+✅ PDF Upload
 
-    uploaded_pdf = st.file_uploader(
+✅ Auto Question Detection
+
+✅ Auto Answer Key Detection
+
+✅ Practice Mode
+
+✅ Mock Test
+
+✅ Timer
+
+✅ Save & Next
+
+✅ Previous
+
+✅ Question Palette
+
+✅ Result Analysis
+"""
+    )
+
+# ---------- Upload ----------
+
+elif menu == "📂 Upload PDF":
+
+    st.subheader("Upload MCQ PDF")
+
+    pdf = st.file_uploader(
         "Choose PDF",
         type=["pdf"]
     )
 
-    if uploaded_pdf:
+    if pdf:
 
-        st.success(uploaded_pdf.name)
+        APP["pdf_name"] = pdf.name
+
+        st.success(pdf.name)
 
         if st.button("Read PDF"):
 
             st.info("PDF Reader will be added in Part 2.")
 
+# ---------- Practice ----------
+
 elif menu == "🎯 Practice Mode":
 
-    st.title("🎯 Practice Mode")
+    st.warning("Upload a PDF first.")
 
-    st.info("Please upload PDF first.")
+# ---------- Mock Test ----------
 
 elif menu == "📝 Mock Test":
 
-    st.title("📝 Mock Test")
+    st.warning("Upload a PDF first.")
 
-    st.info("Please upload PDF first.")
+# ---------- Result ----------
 
 elif menu == "📊 Result":
 
-    st.title("📊 Result")
-
-    st.info("No Result Available.")
+    st.warning("No Result Available.")
+    
