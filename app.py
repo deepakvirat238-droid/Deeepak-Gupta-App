@@ -361,3 +361,38 @@ if st.session_state.text:
         st.info(
             "No Answer Key detected in PDF."
     )
+# =====================================
+# QUIZ NAVIGATION
+# =====================================
+
+if "current_question" not in st.session_state:
+    st.session_state.current_question = 0
+
+total_questions = len(st.session_state.questions)
+
+if total_questions > 0:
+
+    progress = (st.session_state.current_question + 1) / total_questions
+    st.progress(progress)
+
+    st.write(
+        f"Question {st.session_state.current_question + 1} of {total_questions}"
+    )
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        if st.button("⬅ Previous"):
+            if st.session_state.current_question > 0:
+                st.session_state.current_question -= 1
+                st.rerun()
+
+    with col2:
+        if st.button("🏁 Finish Test"):
+            st.success("Quiz Finished!")
+
+    with col3:
+        if st.button("Next ➡"):
+            if st.session_state.current_question < total_questions - 1:
+                st.session_state.current_question += 1
+                st.rerun()
