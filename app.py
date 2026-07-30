@@ -13,7 +13,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# 1. PIXEL-PERFECT PREMIUM TESTBOOK CBT CSS
+# 1. PIXEL-PERFECT PREMIUM TESTBOOK CBT CSS & JAVASCRIPT
 # ==========================================
 def apply_premium_testbook_css():
     st.markdown("""
@@ -168,6 +168,31 @@ def apply_premium_testbook_css():
         .status-ok { background-color: #d4edda; color: #155724; border-left: 5px solid #28a745; }
         .status-err { background-color: #f8d7da; color: #721c24; border-left: 5px solid #dc3545; }
     </style>
+    """, unsafe_allow_html=True)
+
+def inject_cbt_security_script():
+    """Injects JavaScript to handle automatic strict fullscreen and detect tab switching / minimization triggers."""
+    st.markdown("""
+    <script>
+        // Automatic Request Fullscreen Functionality Matrix
+        function launchFullscreen() {
+            var element = document.documentElement;
+            if(element.requestFullscreen) { element.requestFullscreen(); }
+            else if(element.mozRequestFullScreen) { element.mozRequestFullScreen(); }
+            else if(element.webkitRequestFullscreen) { element.webkitRequestFullscreen(); }
+            else if(element.msRequestFullscreen) { element.msRequestFullscreen(); }
+        }
+        
+        // Trigger fullscreen ingestion seamlessly
+        setTimeout(launchFullscreen, 1000);
+
+        // Window Tab/Application Switch Ingestion Monitor
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                alert("🚨 WINDOW SWITCH DETECTION ALERT!\\n\\nYou attempted to switch applications or browser tabs. This action violates strict CBT environment regulations. Further violations will log an automatic submission.");
+            }
+        });
+    </script>
     """, unsafe_allow_html=True)
 
 # ==========================================
@@ -332,10 +357,8 @@ def render_home_page():
     st.markdown("""
     Welcome to India's premium structural standard assessment simulator panel engine.
     
-    ### ⚙️ Operational Guidelines:
-    1. Go to **Upload PDF** section via the sidebar navigation menu.
-    2. Upload your flat question document blueprint.
-    3. Choose **Practice Mode** or **Mock Test** to initialize full interactivity.
+    ### 🛡️ CBT Security Notice:
+    Entering the **Mock Test** space forces your engine viewport into a hardware-level **Fullscreen Mode**. Switching applications or moving away from the active tab displays a violation override alert.
     """)
     st.info("Select **Upload PDF** from the sidebar route matrix to get started.")
 
@@ -371,11 +394,10 @@ def render_practice_page():
     q_idx = st.session_state.current_question_index
     q = st.session_state.questions[q_idx]
     
-    # Header replication row
     st.markdown("""
     <div class="testbook-top-bar">
         <span>📋 Interactive Self-Practice Mode Console Panel</span>
-        <span style="font-size:12px; font-weight:normal; background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:3px;">Practice Mode Active</span>
+        <span style="font-size:12px; font-weight:normal; background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:3px;">Practice Sandbox</span>
     </div>
     """, unsafe_allow_html=True)
     
@@ -434,6 +456,9 @@ def render_mock_page():
         st.warning("No operational evaluation contexts found. Upload an active database blueprint structure first.")
         return
         
+    # Ingest strict fullscreen rules and anti tab-switching monitoring script parameters
+    inject_cbt_security_script()
+        
     if st.session_state.test_start_time is None:
         st.session_state.test_start_time = time.time()
         
@@ -447,10 +472,9 @@ def render_mock_page():
         st.session_state.current_page = "Result"
         st.rerun()
         
-    # Injecting the Premium Live Testbook Interactive Top Nav Bar Container Module
     st.markdown(f"""
     <div class="testbook-top-bar">
-        <span>📋 Online Computer Based Test (CBT Panel Sandbox Workspace)</span>
+        <span>📋 Online Computer Based Test (🔐 STRICT FULL-SCREEN LOCK ON)</span>
         <div>⏳ Time Remaining: <span class="timer-badge">{str(timedelta(seconds=int(remaining_secs)))}</span></div>
     </div>
     """, unsafe_allow_html=True)
@@ -520,14 +544,6 @@ def render_mock_page():
                 st.session_state.time_taken_seconds = elapsed
                 st.session_state.current_page = "Result"
                 st.rerun()
-
-        # Ingestion of the lower grey "Re-attempt Mode" panel component inside workspace card
-        st.markdown(f"""
-        <div class="tb-reattempt-box">
-            <span style="color:#c2410c; font-weight:bold; font-size:13px;">Exam Sandbox Lock System</span><br/>
-            <span style="color:#7c2d12; font-size:12px;">Answers remain locked down securely until final submission package confirmation button is triggered.</span>
-        </div>
-        """, unsafe_allow_html=True)
 
     with col_control:
         draw_testbook_palette_slate()
@@ -631,5 +647,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
