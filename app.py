@@ -6,7 +6,7 @@ from datetime import timedelta
 
 # Set premium responsive layout rules as the entry point execution criteria
 st.set_page_config(
-    page_title="Testbook Engine — Premium Sectional Solutions Desk",
+    page_title="Testbook Engine — MockTest Pro Premium Suite",
     page_icon="📝",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -45,24 +45,13 @@ def apply_premium_testbook_solutions_css():
             cursor: pointer;
         }
 
-        /* Section Tabs Header Segment Row Layout */
-        .tb-sections-bar {
-            background-color: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 0px 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .tb-section-lbl { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-right: 10px; }
-
         /* Question Frame View Box Layout Card Container */
         .tb-q-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 4px;
             padding: 20px 20px 15px 20px;
+            margin-top: 15px;
             margin-bottom: 0px;
         }
         
@@ -177,8 +166,6 @@ def init_session_state():
         st.session_state.answer_key = {}
     if 'current_question_index' not in st.session_state:
         st.session_state.current_question_index = 0
-    if 'active_section' not in st.session_state:
-        st.session_state.active_section = "Mathematics"
     if 'test_start_time' not in st.session_state:
         st.session_state.test_start_time = None
     if 'test_duration_minutes' not in st.session_state:
@@ -193,44 +180,6 @@ def init_session_state():
 # ==========================================
 # 3. ADVANCED SECTOR RECOGNITION & PARSING ENGINE
 # ==========================================
-def auto_classify_question(question_text):
-    """
-    Intelligently auto-detects and categorizes questions into 4 primary domains using context matching.
-    """
-    text = question_text.lower()
-    
-    math_keywords = [
-        'find the value', 'x =', 'y =', 'ratio', 'percentage', 'average', 'profit', 'loss', 'interest', 'sum',
-        'algebra', 'geometry', 'triangle', 'speed', 'distance', 'time', 'work', 'tank', 'cistern', 'cube',
-        'square', 'root', 'numbers', 'divisible', 'lcm', 'hcf', 'trigonometry', 'theta', 'sin', 'cos', 'tan'
-    ]
-    science_keywords = [
-        'planet', 'star', 'newton', 'force', 'velocity', 'acceleration', 'acid', 'base', 'chemical', 'reaction',
-        'element', 'atom', 'molecule', 'cell', 'organ', 'blood', 'disease', 'vitamin', 'physics', 'chemistry',
-        'biology', 'lens', 'mirror', 'light', 'sound', 'energy', 'watt', 'joule', 'ohm', 'gravity', 'oxygen'
-    ]
-    reasoning_keywords = [
-        'series', 'pattern', 'analogy', 'odd one out', 'coding', 'decoding', 'direction', 'blood relation',
-        'sitting arrangement', 'syllogism', 'venn diagram', 'dice', 'calendar', 'clock', 'mirror image',
-        'statement', 'conclusion', 'assumption', 'if then', 'next term'
-    ]
-    english_keywords = [
-        'synonym', 'antonym', 'idiom', 'phrase', 'one word', 'substitution', 'grammatical error',
-        'fill in the blank', 'correct spelling', 'misspelt', 'voice', 'narration', 'direct speech',
-        'indirect speech', 'comprehension', 'passage', 'preposition', 'verb', 'noun', 'adjective'
-    ]
-
-    for kw in math_keywords:
-        if kw in text: return "Mathematics"
-    for kw in science_keywords:
-        if kw in text: return "General Science"
-    for kw in reasoning_keywords:
-        if kw in text: return "General Intelligence & Reasoning"
-    for kw in english_keywords:
-        if kw in text: return "English Language"
-        
-    return "General Awareness"
-
 def extract_pdf_data(uploaded_file):
     """
     Hybrids normal layout readers with deep fallback rendering modes to accurately handle scanned PDF objects.
@@ -244,7 +193,6 @@ def extract_pdf_data(uploaded_file):
             question_text = ""
             for page in pdf.pages[:-1]:
                 text = page.extract_text()
-                # Fallback layout check algorithm for Scanned files
                 if not text or len(text.strip()) < 10:
                     text = page.extract_text(layout=True)
                 if text:
@@ -300,8 +248,6 @@ def parse_questions(text, answer_key):
         for letter, content in opts_found:
             opts_dict[letter.upper()] = re.sub(r'\s+', ' ', content.strip())
             
-        detected_section = auto_classify_question(actual_question)
-            
         questions_list.append({
             "question_number": q_num,
             "question": actual_question,
@@ -311,8 +257,7 @@ def parse_questions(text, answer_key):
             "D": opts_dict['D'],
             "correct_answer": answer_key.get(q_num, "A"),
             "user_answer": None,
-            "review": False,
-            "section": detected_section
+            "review": False
         })
         
     return sorted(questions_list, key=lambda x: x["question_number"])
@@ -320,10 +265,10 @@ def parse_questions(text, answer_key):
 # ==========================================
 # 4. COMPACT PALETTE METRICS PANE SIDEBAR
 # ==========================================
-def draw_right_side_analytics_panel(filtered_questions):
-    correct_cnt = sum(1 for q in filtered_questions if q["user_answer"] == q["correct_answer"])
-    unattempted_cnt = sum(1 for q in filtered_questions if q["user_answer"] is None)
-    incorrect_cnt = len(filtered_questions) - correct_cnt - unattempted_cnt
+def draw_right_side_analytics_panel():
+    correct_cnt = sum(1 for q in st.session_state.questions if q["user_answer"] == q["correct_answer"])
+    unattempted_cnt = sum(1 for q in st.session_state.questions if q["user_answer"] is None)
+    incorrect_cnt = len(st.session_state.questions) - correct_cnt - unattempted_cnt
 
     st.markdown(f"""
     <div class="sb-user-card">
@@ -334,10 +279,10 @@ def draw_right_side_analytics_panel(filtered_questions):
         <span class="sb-stat-pill" style="background-color:#64748b;">{unattempted_cnt} Unattempted</span>
         <span class="sb-stat-pill" style="background-color:#ef4444;">{incorrect_cnt} Incorrect</span>
     </div>
-    <div class="tcs-stats-lbl">Section Grid Palette</div>
+    <div class="tcs-stats-lbl">Question Grid Palette</div>
     """, unsafe_allow_html=True)
     
-    total_qs = len(filtered_questions)
+    total_qs = len(st.session_state.questions)
     grid_cols = 4
     
     for i in range(0, total_qs, grid_cols):
@@ -345,13 +290,11 @@ def draw_right_side_analytics_panel(filtered_questions):
         for j in range(grid_cols):
             idx = i + j
             if idx < total_qs:
-                q = filtered_questions[idx]
+                q = st.session_state.questions[idx]
                 q_num = q["question_number"]
                 
-                global_idx = st.session_state.questions.index(q)
-                
                 badge_icon = "⬜"
-                if global_idx == st.session_state.current_question_index:
+                if idx == st.session_state.current_question_index:
                     badge_icon = "🔵"
                 elif q["review"]:
                     badge_icon = "🟣"
@@ -363,9 +306,9 @@ def draw_right_side_analytics_panel(filtered_questions):
                     badge_icon = "🔴"
                     
                 with cols[j]:
-                    if st.button(f"{badge_icon}{q_num}", key=f"tcs_pal_key_{global_idx}", use_container_width=True):
-                        st.session_state.current_question_index = global_idx
-                        st.session_state.visited_questions.add(global_idx)
+                    if st.button(f"{badge_icon}{q_num}", key=f"tcs_pal_key_{idx}", use_container_width=True):
+                        st.session_state.current_question_index = idx
+                        st.session_state.visited_questions.add(idx)
                         st.rerun()
 
 # ==========================================
@@ -378,7 +321,7 @@ def render_home_page():
     
     ### ⚙️ Enhanced Ingestion Scanning Capabilities:
     *   **Image Layout Handling (Basic OCR Fallback)**: Automatically attempts layout layer restructuring if flat encoded characters are missing or unreadable.
-    *   **Auto Section Classifier**: Distributes questions straight into localized syllabus categories seamlessly.
+    *   **Linear Exam Continuous View**: Sequential unified continuous testing pipeline.
     """)
     st.info("Select **Upload PDF** from the sidebar route matrix to get started.")
 
@@ -387,7 +330,7 @@ def render_upload_page():
     uploaded_file = st.file_uploader("Upload MCQ Exam Sheet Matrix Blueprint Asset (Scanned PDFs are supported):", type=["pdf"])
     
     if uploaded_file is not None:
-        with st.spinner("Decoding layout structures and categorizing sections..."):
+        with st.spinner("Decoding layout structures and preparing exam model..."):
             q_text, ans_text, err = extract_pdf_data(uploaded_file)
             if err:
                 st.error(err)
@@ -400,17 +343,10 @@ def render_upload_page():
                 st.session_state.answer_key = ans_key
                 st.session_state.visited_questions = {0}
                 st.session_state.current_question_index = 0
-                st.session_state.active_section = parsed_qs[0]["section"]
                 st.session_state.test_submitted = False
                 st.session_state.test_start_time = None
                 
-                sections_found = {}
-                for q in parsed_qs:
-                    sections_found[q["section"]] = sections_found.get(q["section"], 0) + 1
-                    
-                st.success(f"Ingestion successful! Loaded {len(parsed_qs)} questions across matching categories.")
-                st.write("📊 **Auto-Classified Section Matrix Yield:**")
-                st.json(sections_found)
+                st.success(f"Ingestion successful! Loaded {len(parsed_qs)} questions linearly inside operational database panels.")
             else:
                 st.error("Text alignment parsing error anomaly detected. Ensure your scanning properties are readable.")
 
@@ -426,30 +362,8 @@ def render_practice_page():
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div style="background:#ffffff; padding:5px 20px 0px 20px; font-size:11px; font-weight:bold; color:#64748b; text-transform:uppercase;">SECTIONS</div>', unsafe_allow_html=True)
-    available_sections = sorted(list(set(q["section"] for q in st.session_state.questions)))
-    
-    s_tabs = st.columns(len(available_sections))
-    for t_idx, sec_name in enumerate(available_sections):
-        with s_tabs[t_idx]:
-            is_active = (st.session_state.active_section == sec_name)
-            btn_type = "primary" if is_active else "secondary"
-            if st.button(sec_name, key=f"tab_btn_{sec_name}", type=btn_type, use_container_width=True):
-                st.session_state.active_section = sec_name
-                first_q_of_sec = next(idx for idx, q in enumerate(st.session_state.questions) if q["section"] == sec_name)
-                st.session_state.current_question_index = first_q_of_sec
-                st.rerun()
-
-    filtered_qs = [q for q in st.session_state.questions if q["section"] == st.session_state.active_section]
-    
-    if not filtered_qs:
-        st.info("No elements loaded under this workspace path profile layout node.")
-        return
-
-    q = st.session_state.questions[st.session_state.current_question_index]
-    if q["section"] != st.session_state.active_section:
-        q = filtered_qs[0]
-        st.session_state.current_question_index = st.session_state.questions.index(q)
+    q_idx = st.session_state.current_question_index
+    q = st.session_state.questions[q_idx]
 
     col_slate, col_analytics = st.columns([3.0, 1.0])
 
@@ -464,7 +378,7 @@ def render_practice_page():
                 {badge_style}
                 <span class="tb-timer-info">⏱ You: 00:16 Avg: 00:22</span>
                 <span class="badge-stat-metric">Marks 1</span>
-                <span class="badge-pct-correct">Section: {q['section']}</span>
+                <span class="badge-pct-correct">72% answered correctly</span>
             </div>
             <div class="tb-question-text">{q['question']}</div>
         </div>
@@ -476,7 +390,7 @@ def render_practice_page():
         selected_option = st.radio("Options Hidden Label Layout Control:", opts, index=curr_sel, key=f"scr_pr_{q['question_number']}")
         
         if selected_option:
-            st.session_state.questions[st.session_state.current_question_index]["user_answer"] = selected_option[0]
+            st.session_state.questions[q_idx]["user_answer"] = selected_option[0]
 
         st.markdown(f"""
         <div class="tb-reattempt-box">
@@ -488,24 +402,20 @@ def render_practice_page():
         st.write("---")
         foot_prev, foot_mid, foot_nxt = st.columns([1, 2, 1])
         
-        current_filtered_idx = filtered_qs.index(q)
-        
         with foot_prev:
-            if st.button("Previous Question", disabled=(current_filtered_idx == 0), use_container_width=True, key="pr_p_b"):
-                prev_q = filtered_qs[current_filtered_idx - 1]
-                st.session_state.current_question_index = st.session_state.questions.index(prev_q)
+            if st.button("Previous Question", disabled=(q_idx == 0), use_container_width=True, key="pr_p_b"):
+                st.session_state.current_question_index -= 1
                 st.rerun()
         with foot_mid:
             st.toggle("Re-attempt Questions Matrix Mode Tracker Toggle Switch Component Layout", value=True, key="tb_toggle_reattempt")
         with foot_nxt:
-            if st.button("Next Question", disabled=(current_filtered_idx == len(filtered_qs) - 1), use_container_width=True, key="pr_n_b"):
-                next_q = filtered_qs[current_filtered_idx + 1]
-                st.session_state.current_question_index = st.session_state.questions.index(next_q)
+            if st.button("Next Question", disabled=(q_idx == len(st.session_state.questions) - 1), use_container_width=True, key="pr_n_b"):
+                st.session_state.current_question_index += 1
                 st.session_state.visited_questions.add(st.session_state.current_question_index)
                 st.rerun()
 
     with col_analytics:
-        draw_right_side_analytics_panel(filtered_qs)
+        draw_right_side_analytics_panel()
 
 def render_mock_page():
     if not st.session_state.questions:
@@ -534,30 +444,12 @@ def render_mock_page():
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown('<div style="background:#ffffff; padding:5px 20px 0px 20px; font-size:11px; font-weight:bold; color:#64748b; text-transform:uppercase;">SECTIONS</div>', unsafe_allow_html=True)
-    available_sections = sorted(list(set(q["section"] for q in st.session_state.questions)))
-    
-    s_tabs = st.columns(len(available_sections))
-    for t_idx, sec_name in enumerate(available_sections):
-        with s_tabs[t_idx]:
-            is_active = (st.session_state.active_section == sec_name)
-            btn_type = "primary" if is_active else "secondary"
-            if st.button(sec_name, key=f"mock_tab_btn_{sec_name}", type=btn_type, use_container_width=True):
-                st.session_state.active_section = sec_name
-                first_q_of_sec = next(idx for idx, q in enumerate(st.session_state.questions) if q["section"] == sec_name)
-                st.session_state.current_question_index = first_q_of_sec
-                st.rerun()
-
-    filtered_qs = [q for q in st.session_state.questions if q["section"] == st.session_state.active_section]
-    
     if st.session_state.test_submitted:
         st.info("Your response profile has closed execution loops. View results via the **Result** page.")
         return
 
-    q = st.session_state.questions[st.session_state.current_question_index]
-    if q["section"] != st.session_state.active_section:
-        q = filtered_qs[0]
-        st.session_state.current_question_index = st.session_state.questions.index(q)
+    q_idx = st.session_state.current_question_index
+    q = st.session_state.questions[q_idx]
     
     col_slate, col_control = st.columns([2.8, 1.2])
     
@@ -568,7 +460,6 @@ def render_mock_page():
                 <span class="tcs-q-idx">Question No. {q['question_number']}</span>
                 <span class="badge-status-cbt" style="background-color:#fee2e2; color:#991b1b; padding: 2px 6px; font-size:11px; border-radius:3px;">Exam Mode Active</span>
                 <span class="badge-stat-metric">Marks 1</span>
-                <span class="badge-pct-correct">Section Target: {q['section']}</span>
             </div>
             <div class="tb-question-text"><b>{q['question']}</b></div>
         </div>
@@ -582,33 +473,29 @@ def render_mock_page():
         st.write("---")
         act_1, act_2, act_3, act_4 = st.columns(4)
         
-        current_filtered_idx = filtered_qs.index(q)
-        
         with act_1:
             if st.button("🟣 Mark for Review & Next", use_container_width=True, key="mk_rev_b"):
-                st.session_state.questions[st.session_state.current_question_index]["review"] = True
+                st.session_state.questions[q_idx]["review"] = True
                 if selected_option:
-                    st.session_state.questions[st.session_state.current_question_index]["user_answer"] = selected_option[0]
-                if current_filtered_idx < len(filtered_qs) - 1:
-                    next_q = filtered_qs[current_filtered_idx + 1]
-                    st.session_state.current_question_index = st.session_state.questions.index(next_q)
+                    st.session_state.questions[q_idx]["user_answer"] = selected_option[0]
+                if q_idx < len(st.session_state.questions) - 1:
+                    st.session_state.current_question_index += 1
                     st.session_state.visited_questions.add(st.session_state.current_question_index)
                 st.rerun()
                 
         with act_2:
             if st.button("🧹 Clear Response", use_container_width=True, key="mk_clr_b"):
-                st.session_state.questions[st.session_state.current_question_index]["user_answer"] = None
-                st.session_state.questions[st.session_state.current_question_index]["review"] = False
+                st.session_state.questions[q_idx]["user_answer"] = None
+                st.session_state.questions[q_idx]["review"] = False
                 st.rerun()
                 
         with act_3:
             if st.button("💾 Save & Next ➡", type="primary", use_container_width=True, key="mk_nxt_b"):
                 if selected_option:
-                    st.session_state.questions[st.session_state.current_question_index]["user_answer"] = selected_option[0]
-                st.session_state.questions[st.session_state.current_question_index]["review"] = False
-                if current_filtered_idx < len(filtered_qs) - 1:
-                    next_q = filtered_qs[current_filtered_idx + 1]
-                    st.session_state.current_question_index = st.session_state.questions.index(next_q)
+                    st.session_state.questions[q_idx]["user_answer"] = selected_option[0]
+                st.session_state.questions[q_idx]["review"] = False
+                if q_idx < len(st.session_state.questions) - 1:
+                    st.session_state.current_question_index += 1
                     st.session_state.visited_questions.add(st.session_state.current_question_index)
                 st.rerun()
                 
@@ -620,14 +507,14 @@ def render_mock_page():
                 st.rerun()
 
     with col_control:
-        draw_right_side_analytics_panel(filtered_qs)
+        draw_right_side_analytics_panel()
 
     if not st.session_state.test_submitted:
         time.sleep(1.0)
         st.rerun()
 
 def render_result_page():
-    st.markdown("<div class='testbook-top-bar'><span>📊 Test Diagnostics & Sectional Performance Analytics Studio</span></div>", unsafe_allow_html=True)
+    st.markdown("<div class='testbook-top-bar'><span>📊 Test Performance Analytics Studio</span></div>", unsafe_allow_html=True)
     
     if not st.session_state.questions or not st.session_state.test_submitted:
         st.warning("No comprehensive test submission log contexts located to process scoring graphs.")
@@ -649,7 +536,7 @@ def render_result_page():
     
     st.write("---")
     m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Total Extracted Assessment Items", total_q)
+    m1.metric("Total Ingested Assessment Items", total_q)
     m2.metric("Verified Valid Core Hits", correct)
     m3.metric("Error Variance Misses", wrong)
     m4.metric("Skipped/Bypassed Nodes", skipped)
@@ -658,15 +545,6 @@ def render_result_page():
     m5.metric("Precision Accuracy Index", f"{accuracy:.2f}%")
     m6.metric("Weighted Score Percentage", f"{final_pct:.2f}%")
     m7.metric("Total Processing Runtime", str(timedelta(seconds=int(st.session_state.time_taken_seconds))))
-    
-    st.write("---")
-    st.markdown("### 🔍 Section-wise Breakdown Diagnostics Matrix")
-    available_sections = sorted(list(set(q["section"] for q in st.session_state.questions)))
-    
-    for sec in available_sections:
-        sec_qs = [q for q in st.session_state.questions if q["section"] == sec]
-        sec_correct = sum(1 for q in sec_qs if q["user_answer"] == q["correct_answer"])
-        st.write(f"📁 **{sec}**: {sec_correct} / {len(sec_qs)} Correct Answers.")
 
 def render_settings_page():
     st.subheader("⚙️ Global Framework Architecture Settings")
@@ -708,9 +586,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
