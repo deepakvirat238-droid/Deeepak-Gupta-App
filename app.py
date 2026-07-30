@@ -4,49 +4,48 @@ import re
 import time
 from datetime import timedelta
 
-# Set page layout configuration immediately as the entry point execution criteria
+# Set premium responsive layout rules as the entry point execution criteria
 st.set_page_config(
-    page_title="Testbook Engine — MockTest Pro Premium Suite",
+    page_title="Testbook Engine — Premium Solutions Desk",
     page_icon="📝",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ==========================================
-# 1. PIXEL-PERFECT PREMIUM TESTBOOK CBT CSS & JAVASCRIPT
+# 1. PIXEL-PERFECT PREMIUM TESTBOOK SOLUTIONS CSS & JS
 # ==========================================
-def apply_premium_testbook_css():
+def apply_premium_testbook_solutions_css():
     st.markdown("""
     <style>
-        /* Force App Base background match */
-        .main { background-color: #f1f3f5 !important; padding: 0px !important; }
+        /* Force App Base canvas container system background reset */
+        .main { background-color: #f8fafc !important; padding: 0px !important; }
         
-        /* TCS iON Rigid Top Header Bar Component Blueprint */
-        .testbook-top-bar {
+        /* Exact Top Blue Navigation Header Banner */
+        .tb-header {
             background-color: #005682;
             color: #ffffff;
-            padding: 12px 20px;
-            font-size: 15px;
-            font-weight: bold;
+            padding: 10px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid #2a5d84;
             font-family: sans-serif;
+            margin-bottom: 0px;
+        }
+        .tb-header-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .tb-analytics-btn {
+            background-color: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 4px 14px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
         }
 
-        .timer-badge {
-            background-color: #ffeeb5;
-            color: #856404;
-            padding: 6px 14px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 16px;
-            border: 1px solid #ffe8a1;
-            font-weight: bold;
-        }
-        
-        /* Section Tabs Header Segment Row */
+        /* Section Tabs Header Segment Row Layout */
         .tb-sections-bar {
             background-color: #ffffff;
             border-bottom: 1px solid #e2e8f0;
@@ -54,30 +53,36 @@ def apply_premium_testbook_css():
             display: flex;
             align-items: center;
             gap: 15px;
+            margin-bottom: 15px;
         }
-        .tb-section-lbl { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; }
+        .tb-section-lbl { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-right: 10px; }
         .tb-tab-active {
             color: #ffffff !important;
             background-color: #005682 !important;
-            padding: 8px 16px;
+            padding: 10px 18px;
             font-size: 13px;
             font-weight: 500;
             border-radius: 4px 4px 0 0;
             display: inline-block;
         }
+        .tb-tab-inactive {
+            color: #334155;
+            padding: 10px 18px;
+            font-size: 13px;
+            display: inline-block;
+            font-weight: 500;
+        }
 
-        /* Question Display Container Panel - Padding optimized */
-        .tcs-question-slate {
+        /* Question Frame View Box Layout Card Container */
+        .tb-q-card {
             background: #ffffff;
-            border: 1px solid #dcdcdc;
-            padding: 20px 20px 10px 20px;
-            min-height: auto;
+            border: 1px solid #e2e8f0;
             border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin-bottom: 5px;
-            margin-top: 15px;
+            padding: 20px 20px 15px 20px;
+            margin-bottom: 0px;
         }
         
+        /* Question Diagnostic Meta Data Ribbon Row (Exact Image Specs) */
         .tcs-meta-row {
             display: flex;
             align-items: center;
@@ -85,96 +90,69 @@ def apply_premium_testbook_css():
             margin-bottom: 15px;
             flex-wrap: wrap;
         }
+        .tcs-q-idx { font-size: 14px; font-weight: bold; color: #1e293b; }
+        .badge-correct-tb { background-color: #22c55e; color: white; padding: 2px 8px; font-size: 11px; font-weight: bold; border-radius: 3px; text-transform: uppercase; }
+        .badge-wrong-tb { background-color: #ef4444; color: white; padding: 2px 8px; font-size: 11px; font-weight: bold; border-radius: 3px; text-transform: uppercase; }
+        .tb-timer-info { font-size: 12px; color: #64748b; font-weight: 500; }
+        .badge-stat-metric { background-color: #22c55e; color: #ffffff; padding: 2px 6px; font-size: 11px; border-radius: 3px; font-weight: bold; }
+        .badge-pct-correct { background-color: #e0f2fe; color: #0369a1; padding: 2px 8px; font-size: 11px; border-radius: 3px; font-weight: 500; }
         
-        .tcs-q-idx {
-            font-size: 15px;
-            font-weight: bold;
-            color: #1e293b;
-        }
+        .tb-question-text { font-size: 15px; color: #1e293b; font-weight: 500; line-height: 1.5; margin-bottom: 5px; }
         
-        .badge-status-cbt {
-            background-color: #e0f2fe; 
-            color: #0369a1; 
-            padding: 2px 6px; 
-            font-size: 11px; 
-            border-radius: 3px; 
-            font-weight: 500;
-        }
-        
-        .tcs-q-text { font-size: 16px; color: #222222; font-weight: 500; line-height: 1.4; margin-bottom: 10px; }
-        
-        /* CSS Hack to reduce space between question container and streamlit radio buttons */
+        /* Ultra-Tight Space Radio Group CSS Overrides */
         div[data-testid="stRadio"] {
-            margin-top: -8px !important;
+            margin-top: -5px !important;
             padding-top: 0px !important;
         }
         div[data-testid="stRadio"] label p {
-            font-size: 15px !important;
+            font-size: 14px !important;
             color: #334155 !important;
+            font-weight: 400 !important;
+        }
+        div[data-testid="stRadio"] > label {
+            display: none !important;
         }
         
-        /* Bottom Gray Frame Box inside core view matrix container */
+        /* Lower Highlighted Context Frame Alert Bar Component Box */
         .tb-reattempt-box {
             background-color: #fff7ed;
             border: 1px solid #ffedd5;
             padding: 12px 15px;
             border-radius: 4px;
-            margin-top: 20px;
-        }
-
-        /* Candidate Context Profile Card */
-        .tcs-profile-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 12px;
-            text-align: center;
-            margin-bottom: 15px;
-            border-radius: 4px;
             margin-top: 15px;
         }
-        
-        /* Numeric Matrix Counter Table System */
-        .tcs-stats-table {
-            width: 100%;
-            font-size: 12px;
-            margin-bottom: 15px;
-            border-collapse: collapse;
+
+        /* Right Hand Sidebar Profile Header Elements */
+        .sb-user-card {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
         }
-        .tcs-stats-table td { padding: 6px; border: 1px solid #e2e8f0; text-align: left; }
-        .tcs-indicator-dot {
+        .sb-stat-pill {
             display: inline-block;
-            width: 14px;
-            height: 14px;
+            font-size: 11px;
+            padding: 3px 8px;
             border-radius: 3px;
-            margin-right: 6px;
-            vertical-align: middle;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            color: #ffffff;
+            font-weight: bold;
         }
+        .tcs-stats-lbl { font-size: 12px; font-weight: bold; color: #475569; margin-top: 10px; margin-bottom: 8px; text-transform: uppercase; }
         
-        /* Streamlit Native Widget Box Constraints Overrides */
+        /* Streamlit Native Button Overrides for Testbook Colors Alignment */
         div.stButton > button {
             border-radius: 3px !important;
             font-size: 13px !important;
             font-weight: 500 !important;
         }
-        
-        /* Response Status Banner Blocks */
-        .status-banner {
-            border-radius: 4px;
-            padding: 10px 15px;
-            margin: 10px 0;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .status-ok { background-color: #d4edda; color: #155724; border-left: 5px solid #28a745; }
-        .status-err { background-color: #f8d7da; color: #721c24; border-left: 5px solid #dc3545; }
     </style>
     """, unsafe_allow_html=True)
 
 def inject_cbt_security_script():
-    """Injects JavaScript to handle automatic strict fullscreen and detect tab switching / minimization triggers."""
+    """Injects JavaScript to handle automatic strict fullscreen and detect tab switching triggers."""
     st.markdown("""
     <script>
-        // Automatic Request Fullscreen Functionality Matrix
         function launchFullscreen() {
             var element = document.documentElement;
             if(element.requestFullscreen) { element.requestFullscreen(); }
@@ -182,21 +160,18 @@ def inject_cbt_security_script():
             else if(element.webkitRequestFullscreen) { element.webkitRequestFullscreen(); }
             else if(element.msRequestFullscreen) { element.msRequestFullscreen(); }
         }
-        
-        // Trigger fullscreen ingestion seamlessly
         setTimeout(launchFullscreen, 1000);
 
-        // Window Tab/Application Switch Ingestion Monitor
         document.addEventListener("visibilitychange", function() {
             if (document.hidden) {
-                alert("🚨 WINDOW SWITCH DETECTION ALERT!\\n\\nYou attempted to switch applications or browser tabs. This action violates strict CBT environment regulations. Further violations will log an automatic submission.");
+                alert("🚨 WINDOW SWITCH DETECTION ALERT!\\n\\nYou attempted to switch applications or browser tabs. This action violates strict CBT environment regulations.");
             }
         });
     </script>
     """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. SESSION STATE PIPELINES INITIALIZATION
+# 2. SESSION STATE ARTIFACT MATRIX INITIALIZATION
 # ==========================================
 def init_session_state():
     if 'current_page' not in st.session_state:
@@ -219,7 +194,7 @@ def init_session_state():
         st.session_state.visited_questions = set()
 
 # ==========================================
-# 3. ADVANCED HIGH-ACCURACY PARSING PIPELINE
+# 3. HIGH-ACCURACY PARSING PIPELINE ENGINE
 # ==========================================
 def extract_pdf_data(uploaded_file):
     try:
@@ -295,70 +270,61 @@ def parse_questions(text, answer_key):
     return sorted(questions_list, key=lambda x: x["question_number"])
 
 # ==========================================
-# 4. COMPACT PALETTE METRICS GRID SIDEBAR
+# 4. COMPACT NAV PALETTE METRICS PANE SIDEBAR
 # ==========================================
-def draw_testbook_palette_slate():
-    answered = sum(1 for q in st.session_state.questions if q["user_answer"] is not None and not q["review"])
-    marked_review = sum(1 for q in st.session_state.questions if q["review"])
-    not_visited = len(st.session_state.questions) - len(st.session_state.visited_questions)
-    not_answered = len(st.session_state.questions) - answered - marked_review - not_visited
+def draw_right_side_analytics_panel():
+    correct_cnt = sum(1 for q in st.session_state.questions if q["user_answer"] == q["correct_answer"])
+    unattempted_cnt = sum(1 for q in st.session_state.questions if q["user_answer"] is None)
+    incorrect_cnt = len(st.session_state.questions) - correct_cnt - unattempted_cnt
 
     st.markdown(f"""
-    <div class="tcs-profile-card">
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="55" style="border-radius:50%; margin-bottom:5px;"><br/>
-        <span style="font-size:13px; font-weight:bold; color:#2c3e50;">Kanchan Kumari</span><br/>
-        <span style="font-size:11px; color:#7f8c8d;">ID: Testbook-2026</span>
+    <div class="sb-user-card">
+        <span style="font-size:14px; font-weight:600; color:#1e293b;">👤 Kanchan Kumari</span>
     </div>
-    <table class="tcs-stats-table">
-        <tr>
-            <td><span class="tcs-indicator-dot" style="background:#28a745;"></span> Answered: <b>{answered}</b></td>
-            <td><span class="tcs-indicator-dot" style="background:#dc3545;"></span> Unanswered: <b>{not_answered}</b></td>
-        </tr>
-        <tr>
-            <td><span class="tcs-indicator-dot" style="background:#6f42c1;"></span> Review: <b>{marked_review}</b></td>
-            <td><span class="tcs-indicator-dot" style="background:#e9ecef; border:1px solid #ccc;"></span> Not Visited: <b>{not_visited}</b></td>
-        </tr>
-    </table>
-    <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:#34495e;">Question Navigation Palette:</div>
+    <div style="margin-bottom:10px;">
+        <span class="sb-stat-pill" style="background-color:#22c55e;">{correct_cnt} Correct</span>
+        <span class="sb-stat-pill" style="background-color:#64748b;">{unattempted_cnt} Unattempted</span>
+        <span class="sb-stat-pill" style="background-color:#ef4444;">{incorrect_cnt} Incorrect</span>
+    </div>
+    <div class="tcs-stats-lbl">Section : General Science</div>
     """, unsafe_allow_html=True)
     
     total_qs = len(st.session_state.questions)
-    grid_columns_limit = 4
+    grid_cols = 4
     
-    for i in range(0, total_qs, grid_columns_limit):
-        cols = st.columns(grid_columns_limit)
-        for j in range(grid_columns_limit):
+    for i in range(0, total_qs, grid_cols):
+        cols = st.columns(grid_cols)
+        for j in range(grid_cols):
             idx = i + j
             if idx < total_qs:
                 q = st.session_state.questions[idx]
                 q_num = q["question_number"]
                 
-                badge = "⬜"
+                badge_icon = "⬜"
                 if idx == st.session_state.current_question_index:
-                    badge = "🔵"
+                    badge_icon = "🔵"
                 elif q["review"]:
-                    badge = "🟣"
-                elif q["user_answer"] is not None:
-                    badge = "🟢"
-                elif idx in st.session_state.visited_questions:
-                    badge = "🔴"
+                    badge_icon = "🟣"
+                elif q["user_answer"] is None:
+                    badge_icon = "⬜"
+                elif q["user_answer"] == q["correct_answer"]:
+                    badge_icon = "🟢"
+                else:
+                    badge_icon = "🔴"
                     
                 with cols[j]:
-                    if st.button(f"{badge}{q_num}", key=f"tcs_lnk_{idx}", use_container_width=True):
+                    if st.button(f"{badge_icon}{q_num}", key=f"tcs_pal_key_{idx}", use_container_width=True):
                         st.session_state.current_question_index = idx
                         st.session_state.visited_questions.add(idx)
                         st.rerun()
 
 # ==========================================
-# 5. CORE WORKFLOW INTEGRATION ROUTERS
+# 5. CORE WORKFLOW LAYOUT INTEGRATIONS
 # ==========================================
 def render_home_page():
-    st.title("🎯 MockTest Pro — Premium CBT Examination Desk")
+    st.title("🎯 MockTest Pro — Premium Exam Suite")
     st.markdown("""
     Welcome to India's premium structural standard assessment simulator panel engine.
-    
-    ### 🛡️ CBT Security Notice:
-    Entering the **Mock Test** space forces your engine viewport into a hardware-level **Fullscreen Mode**. Switching applications or moving away from the active tab displays a violation override alert.
     """)
     st.info("Select **Upload PDF** from the sidebar route matrix to get started.")
 
@@ -382,9 +348,9 @@ def render_upload_page():
                 st.session_state.current_question_index = 0
                 st.session_state.test_submitted = False
                 st.session_state.test_start_time = None
-                st.success(f"Ingestion successful! Loaded {len(parsed_qs)} questions effectively into active data channels.")
+                st.success(f"Ingestion successful! Loaded {len(parsed_qs)} questions effectively.")
             else:
-                st.error("Text alignment parsing error anomaly detected. Ensure your asset matches standard layouts.")
+                st.error("Text alignment parsing error anomaly detected.")
 
 def render_practice_page():
     if not st.session_state.questions:
@@ -394,69 +360,80 @@ def render_practice_page():
     q_idx = st.session_state.current_question_index
     q = st.session_state.questions[q_idx]
     
+    # 1. Exact Top Header Mockup Component Injected
     st.markdown("""
-    <div class="testbook-top-bar">
-        <span>📋 Interactive Self-Practice Mode Console Panel</span>
-        <span style="font-size:12px; font-weight:normal; background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:3px;">Practice Sandbox</span>
+    <div class="tb-header">
+        <div class="tb-header-title">⬅ Tests &nbsp;&nbsp;|&nbsp;&nbsp; <span style='font-size:13px; font-weight:normal;'>RRB Group D: Morning Practice Mock - Day 02</span></div>
+        <button class="tb-analytics-btn">Analytics</button>
     </div>
     """, unsafe_allow_html=True)
-    
-    st.markdown('<div class="tb-sections-bar"><span class="tb-section-lbl">Sections</span><span class="tb-tab-active">General Science</span></div>', unsafe_allow_html=True)
-    
-    col_slate, col_control = st.columns([2.8, 1.2])
-    
+
+    # 2. Section Segment Tabs Row Mockup Injected
+    st.markdown("""
+    <div class="tb-sections-bar">
+        <span class="tb-section-lbl">Sections</span>
+        <span class="tb-tab-active">General Science</span>
+        <span class="tb-tab-inactive">Mathematics</span>
+        <span class="tb-tab-inactive">General Intelligence</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col_slate, col_analytics = st.columns([3.0, 1.0])
+
     with col_slate:
+        is_correct = q["user_answer"] == q["correct_answer"] if q["user_answer"] else False
+        badge_style = '<span class="badge-correct-tb">Correct</span>' if is_correct else '<span class="badge-wrong-tb">Incorrect / Review</span>'
+        
         st.markdown(f"""
-        <div class="tcs-question-slate">
-            <div class="tcs-q-box">
-                <div class="tcs-meta-row">
-                    <span class="tcs-q-idx">Question No. {q['question_number']}</span>
-                    <span class="badge-status-cbt">Marks 1</span>
-                    <span class="badge-status-cbt" style="background-color:#f0fdf4; color:#166534;">Practice Sandbox</span>
-                </div>
-                <div class="tcs-q-text">{q['question']}</div>
+        <div class="tb-q-card">
+            <div class="tcs-meta-row">
+                <span class="tcs-q-idx">Question No. {q['question_number']}</span>
+                {badge_style}
+                <span class="tb-timer-info">⏱ You: 00:16 Avg: 00:22</span>
+                <span class="badge-stat-metric">Marks 1</span>
+                <span class="badge-pct-correct">72% answered correctly</span>
             </div>
+            <div class="tb-question-text">{q['question']}</div>
         </div>
         """, unsafe_allow_html=True)
-        
+
         opts = [f"A. {q['A']}", f"B. {q['B']}", f"C. {q['C']}", f"D. {q['D']}"]
         curr_sel = ["A", "B", "C", "D"].index(q["user_answer"]) if q["user_answer"] else None
         
-        selected_option = st.radio("Options Hidden Label:", opts, index=curr_sel, key=f"scr_pr_{q_idx}")
+        selected_option = st.radio("Options Hidden Label Layout Control:", opts, index=curr_sel, key=f"scr_pr_{q_idx}")
         
         if selected_option:
-            ans_char = selected_option[0]
-            st.session_state.questions[q_idx]["user_answer"] = ans_char
-            if ans_char == q["correct_answer"]:
-                st.markdown('<div class="status-banner status-ok">✔ Correct Mapping Confirmed!</div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div class="status-banner status-err">✘ Wrong Choice. Target verified configuration coordinate key is: <b>Option {q["correct_answer"]}</b></div>', unsafe_allow_html=True)
+            st.session_state.questions[q_idx]["user_answer"] = selected_option[0]
+
+        st.markdown(f"""
+        <div class="tb-reattempt-box">
+            <span style="color:#c2410c; font-weight:bold; font-size:13px;">Re-attempt mode: ON</span><br/>
+            <span style="color:#7c2d12; font-size:12px;">Now You can re-attempt the question dynamically. Verified Sheet Target Key is <b>Option {q['correct_answer']}</b></span>
+        </div>
+        """, unsafe_allow_html=True)
                 
         st.write("---")
-        nav_c1, nav_c2, nav_c3 = st.columns(3)
-        with nav_c1:
-            if st.button("⬅ Previous Question", disabled=(q_idx == 0), use_container_width=True, key="pr_p_b"):
+        foot_prev, foot_mid, foot_nxt = st.columns([1, 2, 1])
+        with foot_prev:
+            if st.button("Previous Question", disabled=(q_idx == 0), use_container_width=True, key="pr_p_b"):
                 st.session_state.current_question_index -= 1
                 st.rerun()
-        with nav_c2:
-            if st.button("🧹 Clear Response Node", use_container_width=True, key="pr_c_b"):
-                st.session_state.questions[q_idx]["user_answer"] = None
-                st.rerun()
-        with nav_c3:
-            if st.button("Save & Next Question ➡", disabled=(q_idx == len(st.session_state.questions) - 1), use_container_width=True, key="pr_n_b"):
+        with foot_mid:
+            st.toggle("Re-attempt Questions Options Filter Scope Matrix Mode", value=True, key="tb_toggle_reattempt")
+        with foot_nxt:
+            if st.button("Next Question", disabled=(q_idx == len(st.session_state.questions) - 1), use_container_width=True, key="pr_n_b"):
                 st.session_state.current_question_index += 1
                 st.session_state.visited_questions.add(st.session_state.current_question_index)
                 st.rerun()
 
-    with col_control:
-        draw_testbook_palette_slate()
+    with col_analytics:
+        draw_right_side_analytics_panel()
 
 def render_mock_page():
     if not st.session_state.questions:
         st.warning("No operational evaluation contexts found. Upload an active database blueprint structure first.")
         return
         
-    # Ingest strict fullscreen rules and anti tab-switching monitoring script parameters
     inject_cbt_security_script()
         
     if st.session_state.test_start_time is None:
@@ -482,7 +459,7 @@ def render_mock_page():
     st.markdown('<div class="tb-sections-bar"><span class="tb-section-lbl">Sections</span><span class="tb-tab-active">General Science</span></div>', unsafe_allow_html=True)
     
     if st.session_state.test_submitted:
-        st.info("Your response sheet profile has closed execution loops. View report cards via the **Result** dashboard page.")
+        st.info("Your response profile has closed execution loops. View results via the **Result** page.")
         return
 
     q_idx = st.session_state.current_question_index
@@ -492,15 +469,13 @@ def render_mock_page():
     
     with col_slate:
         st.markdown(f"""
-        <div class="tcs-question-slate">
-            <div class="tcs-q-box">
-                <div class="tcs-meta-row">
-                    <span class="tcs-q-idx">Question No. {q['question_number']}</span>
-                    <span class="badge-status-cbt">Marks 1</span>
-                    <span class="badge-status-cbt" style="background-color:#fee2e2; color:#991b1b;">Exam Context Active</span>
-                </div>
-                <div class="tcs-q-text"><b>{q['question']}</b></div>
+        <div class="tb-q-card">
+            <div class="tcs-meta-row">
+                <span class="tcs-q-idx">Question No. {q['question_number']}</span>
+                <span class="badge-status-cbt" style="background-color:#fee2e2; color:#991b1b; padding: 2px 6px; font-size:11px; border-radius:3px;">Exam Mode Active</span>
+                <span class="badge-stat-metric">Marks 1</span>
             </div>
+            <div class="tb-question-text"><b>{q['question']}</b></div>
         </div>
         """, unsafe_allow_html=True)
         
@@ -546,14 +521,14 @@ def render_mock_page():
                 st.rerun()
 
     with col_control:
-        draw_testbook_palette_slate()
+        draw_right_side_analytics_panel()
 
     if not st.session_state.test_submitted:
         time.sleep(1.0)
         st.rerun()
 
 def render_result_page():
-    st.markdown("<div class='testbook-top-bar'><span>📊 Test Diagnostics & Performance Analytics Studio</span></div>", unsafe_allow_html=True)
+    st.markdown("<div class='testbook-top-bar'><span>📊 Performance Analytics Studio</span></div>", unsafe_allow_html=True)
     
     if not st.session_state.questions or not st.session_state.test_submitted:
         st.warning("No comprehensive test submission log contexts located to process scoring graphs.")
@@ -586,26 +561,7 @@ def render_result_page():
     m7.metric("Total Processing Runtime", str(timedelta(seconds=int(st.session_state.time_taken_seconds))))
     
     st.markdown("### 🏆 Estimated Platform Percentile Rank")
-    st.info("Estimated Global Performance Index Tier: **Rank #1 / Mock Calibration Sandbox Leaderboard Baseline**")
-    
-    st.write("---")
-    st.markdown("### 🔍 Granular Structural Question & Solution Matrix Breakdown")
-    for idx, q in enumerate(st.session_state.questions):
-        with st.expander(f"Question Number Record Item Analysis #{q['question_number']}"):
-            st.markdown(f"**Question Text Node Context Content:** {q['question']}")
-            st.write(f"A. {q['A']}")
-            st.write(f"B. {q['B']}")
-            st.write(f"C. {q['C']}")
-            st.write(f"D. {q['D']}")
-            
-            is_correct = q["user_answer"] == q["correct_answer"]
-            if q["user_answer"] is None:
-                st.warning("Skipped Item: No selection matrix log input discovered.")
-            elif is_correct:
-                st.success("Result State: Correct Answer Node Match!")
-            else:
-                st.error(f"Result State: Mismatch. Correct Target Key is Option: {q['correct_answer']}")
-            st.info(f"Verified Reference Sheet Target: Option {q['correct_answer']} | Registered Selection Log Node: {q['user_answer']}")
+    st.info("Estimated Global Performance Index Tier: **Rank #1 / Mock Calibration Leaderboard**")
 
 def render_settings_page():
     st.subheader("⚙️ Global Framework Architecture Settings")
@@ -619,7 +575,7 @@ def render_settings_page():
 # 6. APPLICATION ROUTER DESK INITIALIZER
 # ==========================================
 def main():
-    apply_premium_testbook_css()
+    apply_premium_testbook_solutions_css()
     init_session_state()
     
     st.sidebar.markdown("<h2 style='text-align:center; color:#005682; margin-top:0px;'>📝 Testbook Pro</h2>", unsafe_allow_html=True)
@@ -647,6 +603,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
