@@ -56,27 +56,6 @@ def apply_premium_testbook_solutions_css():
             margin-bottom: 15px;
         }
         .tb-section-lbl { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-right: 10px; }
-        
-        /* Custom Button Override Styling for Real Testbook Dynamic Tabs */
-        div.stButton > button.tb-tab-btn-active {
-            color: #ffffff !important;
-            background-color: #005682 !important;
-            border: 1px solid #005682 !important;
-            padding: 8px 16px !important;
-            font-size: 13px !important;
-            font-weight: 500 !important;
-            border-radius: 4px 4px 0 0 !important;
-        }
-        
-        div.stButton > button.tb-tab-btn-inactive {
-            color: #334155 !important;
-            background-color: transparent !important;
-            border: 1px solid transparent !important;
-            padding: 8px 16px !important;
-            font-size: 13px !important;
-            font-weight: 500 !important;
-            border-radius: 4px 4px 0 0 !important;
-        }
 
         /* Question Frame View Box Layout Card Container */
         .tb-q-card {
@@ -145,6 +124,14 @@ def apply_premium_testbook_solutions_css():
         }
         .tcs-stats-lbl { font-size: 12px; font-weight: bold; color: #475569; margin-top: 10px; margin-bottom: 8px; text-transform: uppercase; }
         
+        /* Streamlit Button Customizations for Tab Aesthetics */
+        div.stButton > button {
+            border-radius: 3px !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease;
+        }
+        
         /* Android System Tweak parameters integration */
         * {
             -webkit-tap-highlight-color: transparent !important;
@@ -212,25 +199,21 @@ def auto_classify_question(question_text):
     """
     text = question_text.lower()
     
-    # Mathematics keywords filter hooks
     math_keywords = [
         'find the value', 'x =', 'y =', 'ratio', 'percentage', 'average', 'profit', 'loss', 'interest', 'sum',
         'algebra', 'geometry', 'triangle', 'speed', 'distance', 'time', 'work', 'tank', 'cistern', 'cube',
         'square', 'root', 'numbers', 'divisible', 'lcm', 'hcf', 'trigonometry', 'theta', 'sin', 'cos', 'tan'
     ]
-    # General Science keywords filter hooks
     science_keywords = [
         'planet', 'star', 'newton', 'force', 'velocity', 'acceleration', 'acid', 'base', 'chemical', 'reaction',
         'element', 'atom', 'molecule', 'cell', 'organ', 'blood', 'disease', 'vitamin', 'physics', 'chemistry',
         'biology', 'lens', 'mirror', 'light', 'sound', 'energy', 'watt', 'joule', 'ohm', 'gravity', 'oxygen'
     ]
-    # Reasoning keywords filter hooks
     reasoning_keywords = [
         'series', 'pattern', 'analogy', 'odd one out', 'coding', 'decoding', 'direction', 'blood relation',
         'sitting arrangement', 'syllogism', 'venn diagram', 'dice', 'calendar', 'clock', 'mirror image',
         'statement', 'conclusion', 'assumption', 'if then', 'next term'
     ]
-    # English keywords filter hooks
     english_keywords = [
         'synonym', 'antonym', 'idiom', 'phrase', 'one word', 'substitution', 'grammatical error',
         'fill in the blank', 'correct spelling', 'misspelt', 'voice', 'narration', 'direct speech',
@@ -246,7 +229,7 @@ def auto_classify_question(question_text):
     for kw in english_keywords:
         if kw in text: return "English Language"
         
-    return "General Awareness" # Default fallback boundary coordinate sheet
+    return "General Awareness"
 
 def extract_pdf_data(uploaded_file):
     try:
@@ -307,7 +290,6 @@ def parse_questions(text, answer_key):
         for letter, content in opts_found:
             opts_dict[letter.upper()] = re.sub(r'\s+', ' ', content.strip())
             
-        # Classify dynamically into sections
         detected_section = auto_classify_question(actual_question)
             
         questions_list.append({
@@ -356,7 +338,6 @@ def draw_right_side_analytics_panel(filtered_questions):
                 q = filtered_questions[idx]
                 q_num = q["question_number"]
                 
-                # Global lookup index tracking mapping
                 global_idx = st.session_state.questions.index(q)
                 
                 badge_icon = "⬜"
@@ -412,11 +393,10 @@ def render_upload_page():
                 st.session_state.answer_key = ans_key
                 st.session_state.visited_questions = {0}
                 st.session_state.current_question_index = 0
-                st.session_state.active_section = parsed_qs[0]["section"] # Automatically set default first category path
+                st.session_state.active_section = parsed_qs[0]["section"]
                 st.session_state.test_submitted = False
                 st.session_state.test_start_time = None
                 
-                # Display structural extraction diagnostics overview counts
                 sections_found = {}
                 for q in parsed_qs:
                     sections_found[q["section"]] = sections_found.get(q["section"], 0) + 1
@@ -432,7 +412,6 @@ def render_practice_page():
         st.warning("No operational evaluation contexts found. Upload an active database blueprint structure first.")
         return
         
-    # Top Information Bar Injection Replication
     st.markdown("""
     <div class="tb-header">
         <div class="tb-header-title">⬅ Tests &nbsp;&nbsp;|&nbsp;&nbsp; <span style='font-size:13px; font-weight:normal;'>SSC CBT Solutions Framework Dashboard Desk Panel</span></div>
@@ -440,7 +419,6 @@ def render_practice_page():
     </div>
     """, unsafe_allow_html=True)
 
-    # Render dynamic section headers toggle bar interface component
     st.markdown('<div style="background:#ffffff; padding:5px 20px 0px 20px; font-size:11px; font-weight:bold; color:#64748b; text-transform:uppercase;">SECTIONS</div>', unsafe_allow_html=True)
     available_sections = sorted(list(set(q["section"] for q in st.session_state.questions)))
     
@@ -448,10 +426,10 @@ def render_practice_page():
     for t_idx, sec_name in enumerate(available_sections):
         with s_tabs[t_idx]:
             is_active = (st.session_state.active_section == sec_name)
-            btn_css_cls = "tb-tab-btn-active" if is_active else "tb-tab-btn-inactive"
-            if st.button(sec_name, key=f"tab_btn_{sec_name}", css_class=btn_css_cls, use_container_width=True):
+            # Differentiate visual selection based on active state parameters safely
+            btn_type = "primary" if is_active else "secondary"
+            if st.button(sec_name, key=f"tab_btn_{sec_name}", type=btn_type, use_container_width=True):
                 st.session_state.active_section = sec_name
-                # Fallback target coordinate tracking update boundary reset
                 first_q_of_sec = next(idx for idx, q in enumerate(st.session_state.questions) if q["section"] == sec_name)
                 st.session_state.current_question_index = first_q_of_sec
                 st.rerun()
@@ -462,7 +440,6 @@ def render_practice_page():
         st.info("No elements loaded under this workspace path profile layout node.")
         return
 
-    # Bound verification logic check mapping framework updates
     q = st.session_state.questions[st.session_state.current_question_index]
     if q["section"] != st.session_state.active_section:
         q = filtered_qs[0]
@@ -551,7 +528,6 @@ def render_mock_page():
     </div>
     """, unsafe_allow_html=True)
     
-    # Section Tabs inside Mock configuration mode panel
     st.markdown('<div style="background:#ffffff; padding:5px 20px 0px 20px; font-size:11px; font-weight:bold; color:#64748b; text-transform:uppercase;">SECTIONS</div>', unsafe_allow_html=True)
     available_sections = sorted(list(set(q["section"] for q in st.session_state.questions)))
     
@@ -559,8 +535,8 @@ def render_mock_page():
     for t_idx, sec_name in enumerate(available_sections):
         with s_tabs[t_idx]:
             is_active = (st.session_state.active_section == sec_name)
-            btn_css_cls = "tb-tab-btn-active" if is_active else "tb-tab-btn-inactive"
-            if st.button(sec_name, key=f"mock_tab_btn_{sec_name}", css_class=btn_css_cls, use_container_width=True):
+            btn_type = "primary" if is_active else "secondary"
+            if st.button(sec_name, key=f"mock_tab_btn_{sec_name}", type=btn_type, use_container_width=True):
                 st.session_state.active_section = sec_name
                 first_q_of_sec = next(idx for idx, q in enumerate(st.session_state.questions) if q["section"] == sec_name)
                 st.session_state.current_question_index = first_q_of_sec
